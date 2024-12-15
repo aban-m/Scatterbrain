@@ -11,6 +11,7 @@ export default function InputArea() {
         setWaiting('Adding...')
         apiCall('/embeddings', { text: text }, 'POST')
             .then((_) => setWaiting(''))
+            .then((_) => handleSubmit())
     };
 
     const handleSubmit = () => {
@@ -18,7 +19,8 @@ export default function InputArea() {
         apiCall('/pca', {}, 'GET')
             .then((r) => r.json()) 
             .then((data) => {
-                setEstate({ embeddings: data['embedding'], texts: data['texts'] })
+                setEstate((_) => {return data})
+                console.log(estate.embeddings[0])
                 setWaiting('')
             });
     }

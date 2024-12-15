@@ -5,6 +5,7 @@ import { createContext, useState, useContext } from 'react';
 const initialState = {
     embeddings: [],
     texts: [],
+    ids: []
 };
 
 const EmbeddingsContext = createContext(); // No default state here

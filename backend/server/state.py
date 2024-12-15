@@ -4,6 +4,7 @@ from server.core import pca
 def add(text, vector: list):
     session['texts'].append(text)
     session['embeddings'].append(vector)
+    session['ids'].append(len(session['ids']) + 1)
     session['pca-synced'] = False
     session.modified = True
     
@@ -13,6 +14,7 @@ def clear():
     session['texts'] = []
     session['embeddings'] = []
     session['pca'] = []
+    session['ids'] = []
 
     session['pca-synced'] = True
     session.modified = True
@@ -22,9 +24,15 @@ def sync_pca():
     session['pca-synced'] = True
     session.modified = True
 
-def remove(index):
+def remove(id):
+    index = [i for i, e in enumerate(session['ids']) if e == id]
+    if not index:
+        raise IndexError(f'Cannot find id {id}')
+    index = index[0]
+
     session['texts'].pop(index)
     session['embeddings'].pop(index)
+    session['ids'].pop(index)
     session['pca-synced'] = False
     session.modified = True
 
@@ -33,5 +41,6 @@ def jsonify(full):
     return {
         'embeddings': what,
         'texts': session['texts'],
-        'pca': not full
+        'pca': not full,
+        'ids': session['ids']
     }
