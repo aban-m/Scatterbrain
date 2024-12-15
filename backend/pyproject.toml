@@ -1,11 +1,12 @@
 [project]
-name = "backend"
+name = "server"
 version = "0.1.0"
-description = "Add your description here"
+description = "The backend for Scatterbrain"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "flask-cors>=5.0.0",
     "flask>=3.1.0",
     "numpy>=2.2.0",
+    "flask-session>=0.8.0",
 ]

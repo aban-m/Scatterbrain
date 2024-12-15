@@ -6,5 +6,8 @@ dist/
 wheels/
 *.egg-info
 
+# Data
+flask_session/
+
 # Virtual environments
 .venv
