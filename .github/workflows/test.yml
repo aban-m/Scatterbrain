@@ -1,0 +1,15 @@
+name: Manual Trigger Example
+
+on:
+  workflow_dispatch:
+
+jobs:
+  post_request_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make POST request to reload webapp
+        run: |
+          response=$(curl -X POST "https://www.pythonanywhere.com/api/v0/user/${{ secrets.PA_USERNAME }}/webapps/${{ secrets.PA_DNAME }}/reload/" \
+          -H "Authorization: Token ${{ secrets.PA_TOKEN }}" \
+          -H "Content-Type: application/json" -w "%{http_code}")
+          echo "Response code: $response"
