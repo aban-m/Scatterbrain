@@ -1,0 +1,61 @@
+name: Deploy backend on PythonAnywhere
+
+on:
+    push:
+        branches:
+            - test=deploy
+
+jobs:
+  build-frontend:
+    name: Build React app
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout repo
+          uses: actions/checkout@v2
+          
+        - name: Install Node.js
+          uses: actions/setup-node@v3
+          
+        - name: Install deps
+          uses: bahmutov/npm-install@v1
+          
+        - name: Build project
+          run: npm run build
+          
+        - name: Upload production files
+          uses: actions/upload-artifacts@v3
+          with:
+            name: prod-files
+            path: ./dist
+            
+  deploy-frontend:
+    name: Deploy React app
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+        - name: Download production files
+          uses: actions/download-artifacts@v3
+          with:
+            name: prod-files
+            path: ./dist
+        - name: Deploy to GitHub pages
+          uses: peaceiris/actions-gh-pages@v3
+          with:
+            github_token: ${{ secrets.GH_TOKEN }}
+            publish_dir: ./dist
+    
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout repo
+          uses: actions/checkout@v2
+        
+        # ... uploading files ...
+        
+        - name: Reload webapp
+          uses: jensvog/pythonanywhere-webapp-reload-action@v1
+          with:
+            username: {{ secrets.PA_USERNAME }}
+            api-token: {{ secrets.PA_TOKEN }}
+            domain-name: {{ secrets.PA_DNAME }}
