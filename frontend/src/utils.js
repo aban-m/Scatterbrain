@@ -13,6 +13,7 @@ export function apiCall(endpoint, payload, method = 'GET') {
         url,
         {
             ...body,
+            credentials: 'include',
             method: method
         }
     )

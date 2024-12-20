@@ -18,7 +18,7 @@ app.config.update(dict(
 ))
 
 
-CORS(app)
+CORS(app, supports_credentials=True) # Access-Control-Allow-Credentials: true
 sess = Session()
 sess.init_app(app)
 
