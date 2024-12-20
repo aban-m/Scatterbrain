@@ -14,11 +14,13 @@ app.config.update(dict(
     SESSION_FILE_THRESHOLD = 100,
     PERMANENT_SESSION_LIFETIME = 86400,
     SESSION_SERIALIZATION_FORMAT = 'json',
+    SESSION_COOKIE_SAMESITE = 'None',
+    SESSION_COOKIE_SECURE = True,
     SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir='_scatterbrain_sessions')
 ))
 
 
-CORS(app)
+CORS(app, supports_credentials=True) # Access-Control-Allow-Credentials: true
 sess = Session()
 sess.init_app(app)
 
