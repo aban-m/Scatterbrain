@@ -14,7 +14,7 @@ app.config.update(dict(
     SESSION_FILE_THRESHOLD = 100,
     PERMANENT_SESSION_LIFETIME = 86400,
     SESSION_SERIALIZATION_FORMAT = 'json',
-    SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir='/.sessions')
+    SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir='~/.sessions')
 ))
 
 
