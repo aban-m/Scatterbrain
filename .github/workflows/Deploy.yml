@@ -3,7 +3,7 @@ name: Deploy backend on PythonAnywhere
 on:
     push:
         branches:
-            - test-deploy
+            - test=deploy
 
 jobs:
   build-frontend:
@@ -28,9 +28,9 @@ jobs:
             name: prod-files
             path: ./dist
             
-  deploy-frontend:
+  deploy-backend:
     name: Deploy React app
-    needs: build-frontend
+    needs: build
     runs-on: ubuntu-latest
     
     steps:
@@ -54,6 +54,8 @@ jobs:
         # ... uploading files ...
         
         - name: Reload webapp
-          run: |
-            curl -X POST "https://www.pythonanywhere.com/api/v0/user/${{ secrets.PA_USERNAME }}/webapps/${{ secrets.PA_DNAME }}/reload/" \
-                 -H "Authorization: Token ${{ secrets.PA_TOKEN }}"
+          uses: jensvog/pythonanywhere-webapp-reload-action@v1
+          with:
+            username: {{ secrets.PA_USERNAME }}
+            api-token: {{ secrets.PA_TOKEN }}
+            domain-name: {{ secrets.PA_DNAME }}
