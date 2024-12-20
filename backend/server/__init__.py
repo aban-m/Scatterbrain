@@ -1,5 +1,4 @@
 import uuid
-import tomllib
 from cachelib.file import FileSystemCache
 from flask import Flask, session
 from flask_cors import CORS
@@ -8,14 +7,14 @@ from server import state
 from server import apiviews
 
 app = Flask(__name__)
-
-with open('server/config.toml', 'rb') as f:
-    app.config.update(tomllib.load(f)['flask'])
 app.config['SECRET_KEY'] = 'secretkey'
-
 app.config.update(dict(
+    SESSION_TYPE = 'filesystem',
+    SESSION_PERMANENT = True,
+    SESSION_FILE_THRESHOLD = 100,
+    PERMANENT_SESSION_LIFETIME = 86400,
     SESSION_SERIALIZATION_FORMAT = 'json',
-    SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir='/.sessions')
+    SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir='~/.sessions')
 ))
 
 
@@ -28,7 +27,7 @@ def initiate_session():
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
         state.clear()
-    print(f'request from {session['session_id']}')
+    print(f'request from {session["session_id"]}')
 
 @app.route('/')
 def index():
