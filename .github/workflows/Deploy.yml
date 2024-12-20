@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - name: Checkout repo
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
           
         - name: Install Node.js
           uses: actions/setup-node@v3
@@ -23,7 +23,7 @@ jobs:
           run: npm run build
           
         - name: Upload production files
-          uses: actions/upload-artifacts@v3
+          uses: actions/upload-artifacts@v4
           with:
             name: prod-files
             path: ./dist
