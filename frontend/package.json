@@ -8,6 +8,7 @@
     "dev-host": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
+    "deploy": "gh-pages -d dist",
     "preview": "vite preview"
   },
   "dependencies": {
