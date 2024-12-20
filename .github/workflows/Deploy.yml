@@ -3,7 +3,7 @@ name: Deploy backend on PythonAnywhere
 on:
     push:
         branches:
-            - test=deploy
+            - test-deploy
 
 jobs:
   build-frontend:
