@@ -54,9 +54,6 @@ jobs:
         # ... uploading files ...
         
         - name: Reload webapp
-          uses: jensvog/pythonanywhere-webapp-reload-action@v1
-          with:
-            host: www.pythonanywhere.com
-            username: ${{ secrets.PA_USERNAME }}
-            api-token: ${{ secrets.PA_TOKEN }}
-            domain-name: ${{ secrets.PA_DNAME }}
+          run: |
+            curl -X POST "https://www.pythonanywhere.com/api/v0/user/${{ secrets.PA_USERNAME }}/webapps/${{ secrets.P_DNAME }}/reload/" \
+                 -H "Authorization: Token ${{ secrets.PA_TOKEN }}"
