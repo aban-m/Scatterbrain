@@ -23,19 +23,19 @@ jobs:
           run: npm run build
           
         - name: Upload production files
-          uses: actions/upload-artifacts@v4
+          uses: actions/upload-artifact@v4
           with:
             name: prod-files
             path: ./dist
             
-  deploy-backend:
+  deploy-frontend:
     name: Deploy React app
     needs: build
     runs-on: ubuntu-latest
     
     steps:
         - name: Download production files
-          uses: actions/download-artifacts@v3
+          uses: actions/download-artifact@v3
           with:
             name: prod-files
             path: ./dist
