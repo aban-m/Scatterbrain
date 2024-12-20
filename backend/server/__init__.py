@@ -28,7 +28,7 @@ def initiate_session():
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
         state.clear()
-    print(f'request from {session['session_id']}')
+    print(f'request from {session["session_id"]}')
 
 @app.route('/')
 def index():
