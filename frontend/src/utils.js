@@ -1,8 +1,7 @@
 export function apiCall(endpoint, payload, method = 'GET') {
-    const url = 'http://' +
-		(import.meta.env.MODE === 'development' ? 
-			'localhost:5000' : 
-			'abanm.pythonanywhere.com') + 		// a more elegant solution should be possible
+    const url = (import.meta.env.MODE === 'development' ? 
+			'http://localhost:5000' : 
+			'https://abanm.pythonanywhere.com') + 		// a more elegant solution should be possible
 		`/api${endpoint}`
     const body = (method == 'GET') ? {} : {
         body: JSON.stringify(payload),

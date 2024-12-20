@@ -1,9 +1,8 @@
-name: Deploy backend on PythonAnywhere
+name: Build and deploy
 
 on:
     push:
-        branches:
-            - test-deploy
+        branches: [master]
 
 jobs:
   build-frontend:
