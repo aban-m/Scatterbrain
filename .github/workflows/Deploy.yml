@@ -3,12 +3,15 @@ name: Deploy backend on PythonAnywhere
 on:
     push:
         branches:
-            - test=deploy
+            - test-deploy
 
 jobs:
   build-frontend:
     name: Build React app
     runs-on: ubuntu-latest
+    defaults:
+        run:
+            working-directory: ./frontend
     steps:
         - name: Checkout repo
           uses: actions/checkout@v4
@@ -17,7 +20,7 @@ jobs:
           uses: actions/setup-node@v3
           
         - name: Install deps
-          uses: bahmutov/npm-install@v1
+          run: npm install
           
         - name: Build project
           run: npm run build
@@ -26,36 +29,34 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: prod-files
-            path: ./dist
+            path: ./frontend/dist
             
   deploy-frontend:
     name: Deploy React app
-    needs: build
+    needs: build-frontend
     runs-on: ubuntu-latest
     
     steps:
         - name: Download production files
-          uses: actions/download-artifact@v3
+          uses: actions/download-artifact@v4
           with:
             name: prod-files
-            path: ./dist
+            path: ./frontend/dist
         - name: Deploy to GitHub pages
           uses: peaceiris/actions-gh-pages@v3
           with:
-            github_token: ${{ secrets.GH_TOKEN }}
-            publish_dir: ./dist
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: ./frontend/dist
     
   deploy-backend:
     runs-on: ubuntu-latest
     steps:
         - name: Checkout repo
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
         
-        # ... uploading files ...
-        
-        - name: Reload webapp
-          uses: jensvog/pythonanywhere-webapp-reload-action@v1
-          with:
-            username: {{ secrets.PA_USERNAME }}
-            api-token: {{ secrets.PA_TOKEN }}
-            domain-name: {{ secrets.PA_DNAME }}
+        - name: Make POST request to reload webapp
+          run: |
+            response=$(curl -X POST "https://www.pythonanywhere.com/api/v0/user/${{ secrets.PA_USERNAME }}/webapps/${{ secrets.PA_DNAME }}/reload/" \
+            -H "Authorization: Token ${{ secrets.PA_TOKEN }}" \
+            -H "Content-Type: application/json" -w "%{http_code}")
+            echo "Response code: $response"
