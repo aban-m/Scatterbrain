@@ -1,0 +1,2 @@
+## Scatterbrain
+Visualize text embeddings.

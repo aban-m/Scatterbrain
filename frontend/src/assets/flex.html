@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Flexmagic
+    </title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script>
+	var count = 1;
+	function pushFlex() {
+		for (let i=1; i < 2; i++) {
+			const b = document.createElement('div');
+			b.classList.add('block');
+			b.classList.add('flex-block');
+			b.classList.add('artifical-block');
+			b.style.backgroundColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
+			b.addEventListener('click', pushFlex);
+			b.addEventListener('mouseenter', function () {
+				[...document.getElementsByClassName('block')].forEach((b) => {b.style.backgroundColor = `#${Math.floor(Math.random()*16777215).toString(16)}` });
+			});
+			const container = document.getElementById('fc1');
+			container.appendChild(b);
+			count++;
+		}
+	}
+	function pushCreation() {
+		const id = document.createElement('div');
+		id.innerHTML = `#${count}`;
+		id.style.backgroundColor = 'white';
+		const txt = document.createElement('input');
+		const rm = document.createElement('button');
+		rm.innerHTML = '+';
+		const ed = document.createElement('button');
+		ed.innerHTML = 'E';
+	
+		id.classList.add('id');
+		rm.classList.add('crud');
+		
+		const tgt = document.getElementById('gfc1');
+		tgt.appendChild(id);
+		tgt.appendChild(txt);
+		tgt.appendChild(rm);
+		tgt.appendChild(ed);
+	
+		count++;
+	}
+	
+	document.addEventListener('DOMContentLoaded', () => { 
+		for (i=1; i<20; i++) {
+			pushCreation();
+		}
+	});
+	</script>
+
+    <style>
+		body {
+			margin: 3px 20px 3px 20px;
+		}
+		
+		
+		.cbutton {
+			padding: 1em 5px 1em 5px;
+			background-color: white;
+			border-width: 1px;
+			border-color: rgb(70, 70, 200);
+			width: 100%;
+			height: 100%;
+			color: black;
+			transition: all 0.1s ease-in;
+			font-size: 2em;
+			
+		}
+		
+		.cbutton:hover {
+			background-color: rgb(70, 70, 200);
+			border-color: white;
+			color: white;
+		}
+		
+		.container {
+			border-style: dashed;
+			border-color: grey;
+			border-width: 1px;
+			background-color: rgb(240, 250, 255);
+			margin: 20px;
+			padding: 5px;
+		}
+		
+		
+		.artifical-block {
+			opacity: 70%;
+		}
+		
+		
+		.block {
+			border-radius: 3px;
+			border: 2px solid grey;
+			opacity; 90%;
+			
+			padding: 5px;
+			
+			width: 100px;
+			height: 100px;
+			background-color: lightblue;
+			
+			transition: transform 0.4s ease-in-out;
+		}
+		
+		.flex-container {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: flex-start;
+			gap: 1em;
+		}
+		
+		
+		.total-container {
+			height: calc(100vh - 5rem);
+		}
+		
+		.subflex {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-start;
+			gap: 0.5em;
+			align-items: flex-start;
+		}
+		
+		.side-extreme {
+			display: flex;
+			justify-self: flex-end;
+			justify-content: center;
+			width: 100%;
+		}
+		
+		#side-footer {
+			border-top: 1px solid gray;
+			margin-top: 3px;
+		}
+		
+		#side-header {
+			border-bottom: 1px solid gray;
+			margin-bottom: 3px;
+		}
+		
+		#side {
+			border-style: solid;
+			border-width: 0px 1px 0px 0px;
+			flex-basis: 15%;
+			flex-shrink: 1;
+			padding-right: clamp(20px, 1%, 20px);
+			padding-left: clamp(20px, 1%, 20px);
+		}
+		
+		#gfc1-parent {
+			overflow-y: auto;
+			flex-grow: 1;
+		}
+		#gfc1 {
+			margin-right: 5px;
+		}
+		#main {
+			border: 1px dashed grey;
+			flex: 1;
+		}
+		
+		.grid-container {
+			display: grid;
+			grid-template-columns: 1fr 4fr 1fr 1fr;
+			grid-auto-rows: clamp(10%, 1fr, 10%);
+			grid-gap: 1em;
+			grid-auto-flow: rows;
+		}
+		
+		.crud {
+			grid-column: span 1;
+			
+		}
+		
+		
+    </style>
+</head>
+
+<body>
+	<div class="container flex-container total-container" id="fc1">
+		<div id="side" class="total-container subflex">
+			<div id="side-header" class="side-extreme">
+				<h2>header</h2>
+			</div>
+			<div id="gfc1-parent">
+				<div class="grid-container" id="gfc1">
+				
+				</div>
+			</div>
+			<div id="side-footer" class="side-extreme">
+				<button class="cbutton" onclick="pushCreation()">Add</button>
+			</div>
+		</div>
+		<div id="main" class="total-container">
+			<h2>Main shit here</h2>
+		</div>
+	</div>
+</body>
+
+</html>

@@ -14,3 +14,8 @@ export function apiCall(endpoint, payload, method = 'GET') {
         }
     )
 }
+
+export function resolveId(id, estate) {
+    const ind = estate.ids.indexOf(id)
+    return {text: estate.texts[ind], embedding: estate.embeddings[ind]}
+}

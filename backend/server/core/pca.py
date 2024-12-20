@@ -13,6 +13,11 @@ def pca(X, n_components = 2):
         components (ndarray): Principal components of shape (n_components, n_features).
         explained_variance (ndarray): Explained variance of each component.
     """
+    match len(X):
+        case 0:
+            return [[]]
+        case 1:
+            return [[0.0], [0.0]]
     # Step 1: Standardize the data (mean = 0, variance = 1)
     X_meaned = X - np.mean(X, axis=0)
 

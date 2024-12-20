@@ -22,7 +22,7 @@ def echo():
 			'echo': request.json['text'].upper()
 		}
 	
-@bp.route('/embeddings', methods=('POST','GET'))
+@bp.route('/embeddings', methods=('POST','GET', 'DELETE', 'PATCH'))
 def embeddings():
 	# get the json of the request
 	if request.method == 'GET':
@@ -32,7 +32,13 @@ def embeddings():
 		if tgt == 'all':
 			state.clear()
 		else:
-			state.remove(tgt)
+			state.delete(tgt)
+		return state.jsonify(False)
+	elif request.method == 'PATCH':
+		tgt, new_text = request.json['target'], request.json['new']
+		new_embedding = embed(new_text)
+		state.update(tgt, new_text, new_embedding)
+		return state.jsonify(False)
 	else:
 		text = request.json['text']
 		vector = embed(text)
