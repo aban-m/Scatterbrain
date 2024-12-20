@@ -14,7 +14,7 @@ app.config.update(dict(
     SESSION_FILE_THRESHOLD = 100,
     PERMANENT_SESSION_LIFETIME = 86400,
     SESSION_SERIALIZATION_FORMAT = 'json',
-    SESSION_COOKIE_SAMESITE = None,
+    SESSION_COOKIE_SAMESITE = 'None',
     SESSION_COOKIE_SECURE = True,
     SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir='_scatterbrain_sessions')
 ))
