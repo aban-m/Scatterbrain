@@ -49,13 +49,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - name: Checkout repo
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
         
-        # ... uploading files ...
-        
-        - name: Reload webapp
-          uses: jensvog/pythonanywhere-webapp-reload-action@v1
-          with:
-            username: {{ secrets.PA_USERNAME }}
-            api-token: {{ secrets.PA_TOKEN }}
-            domain-name: {{ secrets.PA_DNAME }}
+        - name: Make POST request to reload webapp
+          run: |
+            response=$(curl -X POST "https://www.pythonanywhere.com/api/v0/user/${{ secrets.PA_USERNAME }}/webapps/${{ secrets.PA_DNAME }}/reload/" \
+            -H "Authorization: Token ${{ secrets.PA_TOKEN }}" \
+            -H "Content-Type: application/json" -w "%{http_code}")
+            echo "Response code: $response"
