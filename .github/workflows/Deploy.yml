@@ -18,15 +18,17 @@ jobs:
           
         - name: Install deps
           uses: bahmutov/npm-install@v1
+          working-directory: ./frontend
           
         - name: Build project
           run: npm run build
+          working-directory: ./frontend
           
         - name: Upload production files
           uses: actions/upload-artifact@v4
           with:
             name: prod-files
-            path: ./dist
+            path: ./frontend/dist
             
   deploy-frontend:
     name: Deploy React app
@@ -38,12 +40,12 @@ jobs:
           uses: actions/download-artifact@v3
           with:
             name: prod-files
-            path: ./dist
+            path: ./frontend/dist
         - name: Deploy to GitHub pages
           uses: peaceiris/actions-gh-pages@v3
           with:
             github_token: ${{ secrets.GH_TOKEN }}
-            publish_dir: ./dist
+            publish_dir: ./frontend/dist
     
   deploy-backend:
     runs-on: ubuntu-latest
