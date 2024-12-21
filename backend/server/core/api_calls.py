@@ -11,7 +11,7 @@ def invoke_openai(endpoint, payload):
         headers = {'Authorization': f'Bearer {OPENAI_API_KEY}'},
         json = payload
     )
-    if not resp.ok():
+    if not resp.ok:
         logging.error(f'Request failed with HTTP {resp.status_code}.\nContent: {resp.content}.')
-        return None
+        resp.raise_for_status()
     return resp.json()
