@@ -18,13 +18,3 @@ def connect():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
-
-def get_db():
-    if 'db' not in g:
-        g.db = connect()
-    return g.db
-
-def close_db(exception):
-    db = g.pop('db', None)
-    if db is not None:
-        db.close()

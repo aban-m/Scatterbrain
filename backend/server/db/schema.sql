@@ -12,11 +12,10 @@ CREATE TABLE Entries (
     entry_id INT NOT NULL,
     content TEXT NOT NULL,       -- text, either just a text or a description of the image
 
+    is_image BOOLEAN DEFAULT false,
     width INT,
     height INT,
-    image_mini BLOB,
-    image_base64 TEXT,     -- base64 of the image
-
+    image_mini_base64 TEXT,
     embedding TEXT,
     pca TEXT,
 
