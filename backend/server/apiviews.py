@@ -91,7 +91,7 @@ def entries(eid=None):
         return {'ok': True}
             
     elif request.method == 'PATCH':
-        tgt, new_text = eid, request.json['new']
+        tgt, new_text = eid, request.json['text']
         new_embedding = embed(new_text)
         ops.update_entry(g.db, session['user_id'], tgt, new_text, new_embedding)
         return {'ok': True}
