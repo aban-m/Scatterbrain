@@ -17,7 +17,17 @@ export function apiCall(method, endpoint, payload) {
             ...body, method,
             credentials: 'include',			// super-important
         }
-    )
+    ).then((resp) => resp.json())
+}
+
+export function syncPCA(setWaiting, setPCA) {
+	return apiCall('GET', '/pca', {})
+		.then((data) => setPCA(data.pca))
+}
+
+export function syncEntries(setWaiting, setEntries) {
+	return apiCall('GET', '/entries', {})
+		.then((data) => setEntries(data.entries))
 }
 
 export function createText(text) {
