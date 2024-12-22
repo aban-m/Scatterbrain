@@ -5,6 +5,10 @@ from server import apiviews
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secretkey'
+app.config.update(
+    SESSION_COOKIE_SAMESITE='None',  # Enable cross-site cookies
+    SESSION_COOKIE_SECURE=True,  # Ensure it's only sent over HTTPS
+)
 CORS(app, supports_credentials=True) # Access-Control-Allow-Credentials: true
 
 @app.route('/')
