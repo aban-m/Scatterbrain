@@ -14,7 +14,9 @@ config = {
         'model': 'gpt-4o-mini'
     },
     'detail': 'low',
-    'prompt': '''Give a thorough description of the following image, focusing on the main aspects.''',
+    'prompt': '''Give a thorough description of the following image, focusing on the main aspects.
+Go straight to the description, and do not start with "The image..." or any similar phrase.
+''',
     'thumbnail_size': (200, 200)
 }
 

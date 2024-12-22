@@ -29,7 +29,7 @@ export default function App() {
             flexShrink: 1,
             p: isMobile ? 'clamp(1em, 1%, 1em) 0 0 0' : '0 clamp(1em, 1%, 1em) 0 clamp(1em, 1%, 1em)',
             order: isMobile ? 1 : 0,
-            ...(isMobile ? {maxHeight: '20%'} : {minHeight: '20%'}),
+            ...(isMobile ? { maxHeight: '20%' } : { minHeight: '20%' }),
             display: "flex",
             flexDirection: "column",
             overflowY: isMobile ? 'initial' : 'auto'

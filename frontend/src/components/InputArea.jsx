@@ -1,57 +1,158 @@
+/* eslint-disable react/prop-types */
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Typography, Box, CircularProgress } from '@mui/material'
 import { useEmbeddings } from '../contexts/EmbeddingsContext'
 import { useWaiting } from '../contexts/StateContext'
-import { createText, removeEntry, updateEntry,
-	lookupEntry, syncEntries, syncAll } from '../crud.js'
+import {
+    createText, removeEntry, updateEntry,
+    lookupEntry, syncEntries, syncAll,
+    apiCall,
+    apiBase
+} from '../crud.js'
 
 import { TextField, IconButton } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import Tooltip from '@mui/material/Tooltip'
 import CheckIcon from '@mui/icons-material/CheckCircleOutline';
-
+import PhotoCameraBackIcon from '@mui/icons-material/PhotoCameraBack';
 
 function InputAreaHeader() {
-    const [waiting, setWaiting] = useWaiting()
-	console.log(waiting)
     return (<>
-	{waiting}
     </>)
 }
 
 function InputAreaFooter() {
-	const [waiting, setWaiting] = useWaiting()
     return (<>
         <Typography variant='h6' align='center'>
         </Typography>
     </>)
 }
 
-export default function InputArea() {
+function InputField({ waiting }) {
+    const [isText, setIsText] = useState(true)
     const inputRef = useRef(null)
-    const editRef = useRef(null)
-    const [waiting, setWaiting] = useWaiting()
-    const {estate, setEntries, setPCA} = useEmbeddings()
-    const [focused, setFocused] = useState(null)
-
-	useEffect(() => {
-		syncAll(setEntries, setPCA)
-	}, [])
 
     const onAdd = () => {
-        createText(inputRef.current.value).then(() => syncAll(setEntries, setPCA))
+        createText(inputRef.current.value)
         inputRef.current.value = ''
     }
-    const onEdit = () => {
-        updateEntry(editRef.current.value, focused).then(() => syncAll(setEntries, setPCA))
-		setFocused(null)
-		editRef.current.value = null
-    }
-	const onRemove = (id) => {
-		removeEntry(id).then(() => syncAll(setEntries, setPCA))
-	}
 
+    return (
+        <>
+            {
+                isText ?
+                    (<TextField
+                        variant="outlined"
+                        placeholder="Enter text"
+                        inputRef={inputRef}
+                        fullWidth />) : (
+                        <>
+
+                        </>
+                    )
+            }
+
+            {
+                waiting ? (<CircularProgress />) : (
+                    <>
+                        <IconButton
+                            color="primary" disabled={waiting}
+                            onClick={onAdd} // Calls the provided handler
+                        >
+                            <AddCircleIcon />
+                        </IconButton>
+                        <Tooltip title='Add photo' arrow>
+                            <IconButton
+                                color="primary" disabled={waiting}
+                                onClick={() => setIsText(false)}>
+                                <PhotoCameraBackIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </>
+                )
+            }
+        </>
+    )
+}
+
+function TextEntry({ entry, setFocused, waiting }) {
+    return (
+        <>
+            <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                {entry.content}
+            </Typography>
+            <IconButton color='primary' disabled={waiting}
+                onClick={() => setFocused(entry.entry_id)}>
+                <EditIcon />
+            </IconButton>
+            <IconButton color='error' disabled={waiting}
+                onClick={() => removeEntry(entry.entry_id)}>
+                <DeleteIcon />
+            </IconButton>
+        </>
+    )
+}
+
+function PhotoEntry({ entry, setFocused, waiting }) {
+    return (
+        <>
+            <Tooltip title={entry.content.substring(0, 120) + '...'}>
+                <img src={apiBase() + entry.url} style={{
+                    gridColumn: 'span 3', gridRow: 'span 6',
+                    objectFit: 'cover'
+
+                }} />
+
+            </Tooltip>
+        </>
+    )
+}
+
+function TextEntryEdit({ entry, waiting, setFocused }) {
+    const editRef = useRef(null)
+    const onEdit = () => {
+        updateEntry(editRef.current.value, entry.entry_id)
+        setFocused(null)
+        editRef.current.value = null
+    }
+
+    return (
+        <>
+            <input style={{ gridColumn: 'span 2' }}
+                ref={editRef}
+                defaultValue={entry.content}></input>
+            <IconButton color='primary' disabled={waiting}
+                onClick={onEdit}>
+                <CheckIcon />
+            </IconButton>
+        </>
+    )
+}
+
+function PhotoEntryEdit({ entry, waiting, setFocused }) {
+    return (<>
+
+    </>)
+}
+
+function Entry({ entry, waiting, setFocused }) {
+    return !entry.is_image ? TextEntry({ entry, waiting, setFocused }) : PhotoEntry({ entry, waiting, setFocused })
+}
+function EntryEdit({ entry, waiting, setFocused }) {
+    return !entry.is_image ? TextEntryEdit({ entry, waiting, setFocused }) : PhotoEntryEdit({ entry, waiting, setFocused })
+}
+
+export default function InputArea() {
+    const [waiting, setWaiting] = useWaiting()
+    const { estate, setEntries, setPCA } = useEmbeddings()
+    const [focused, setFocused] = useState(null)
+
+    useEffect(() => {
+        setWaiting('Syncing...')
+        syncAll(setEntries, setPCA).then(() => setWaiting(''))
+    }, [])
 
     return (
         <>
@@ -62,58 +163,27 @@ export default function InputArea() {
 
             {/* Text Input and Add Button */}
             <Box sx={{ my: 3, display: "flex", gap: 1 }}>
-                <TextField
-                    variant="outlined"
-                    placeholder="Enter text"
-                    inputRef={inputRef}
-                    fullWidth
-                />
-				{ waiting ? (<CircularProgress />) : (
-                <IconButton
-                    color="primary" disabled={waiting}
-                    onClick={onAdd} // Calls the provided handler
-                >
-                    <AddCircleIcon />
-                </IconButton> ) }
+                <InputField setEntries={setEntries} setPCA={setPCA} waiting={waiting} />
             </Box>
 
             {/* List of TextElements */}
             <Box sx={{
                 display: 'grid',
-                gridTemplateColumns: '7fr 1fr 1fr',
+                gridTemplateColumns: '6fr 1fr 1fr',
                 gridAutoRows: '3em',
                 gridAutoFlow: 'rows',
                 flexGrow: 1
             }}>
-                {estate.entries.map((entry, i) => {
-                    return focused === entry.entry_id ? (
-						 <Fragment key={entry.entry_id}>
-							<input style={{ gridColumn: 'span 2'}}
-									   ref={editRef}
-									   defaultValue={entry.content}></input>
-							<IconButton color='primary' disabled={waiting}
-								onClick={onEdit}>
-								<CheckIcon />
-							</IconButton>
-						</Fragment>
-					)
-					:
-					(
-                        <Fragment key={entry.entry_id}>
-                            <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                                {entry.content}
-                            </Typography>
-                            <IconButton color='primary' disabled={waiting}
-                                onClick={() => setFocused(entry.entry_id)}>
-                                <EditIcon />
-                            </IconButton>
-                            <IconButton color='error' disabled={waiting}
-                                onClick={() => onRemove(entry.entry_id)}>
-                                <DeleteIcon />
-                            </IconButton>
-                        </Fragment>
-                    )
-                })}
+                {estate.entries.map((entry, i) => (
+                    <Fragment key={entry.entry_id}>
+                        {focused === entry.entry_id ? (
+                            <EntryEdit waiting={waiting} entry={entry} setFocused={setFocused} />
+                        ) : (
+                            <Entry waiting={waiting} entry={entry} setFocused={setFocused} />
+                        )
+                        }
+                    </Fragment>
+                ))}
 
             </Box>
 
