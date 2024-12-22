@@ -2,7 +2,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useContext } from 'react'
 
-const initialState = false
+const initialState = ''
 
 const StateContext = createContext(); // No default state here
 export const useWaiting = () => useContext(StateContext);
