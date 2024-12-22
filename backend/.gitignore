@@ -7,7 +7,7 @@ wheels/
 *.egg-info
 
 # Data
-_scatterbrain_sessions
+*.db
 
 # Virtual environments
 .venv
