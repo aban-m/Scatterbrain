@@ -58,7 +58,7 @@ def process(image_input: str, is_url: bool):
         image_base64 = image_input
 
     image_stream = BytesIO(image_bytes)
-    image = Image.open(image_stream)
+    image = Image.open(image_stream).convert('RGB')
     width, height = image.width, image.height # preserve the original data
 
     mini_b64 = base64.b64encode(resize(image, config['thumbnail_size'])).decode('ascii')
