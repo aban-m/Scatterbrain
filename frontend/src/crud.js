@@ -4,8 +4,9 @@ export const lookupEntry = (entries, id) => entries.find(item => item.entry_id =
 
 
 export function apiCall(method, endpoint, payload) {
-    const url = 'http://localhost:5000' +
-		`/api${endpoint}`
+    const url = (import.meta.env.MODE === 'development' ? 
+			'http://localhost:5000' : 
+			'https://abanm.pythonanywhere.com') + `/api${endpoint}`
     const body = (method == 'GET') ? {} : {
         body: JSON.stringify(payload),
         headers: {
