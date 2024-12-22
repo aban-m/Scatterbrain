@@ -41,10 +41,8 @@ def echo():
 
 @bp.route('/image/<uid>/<int:eid>', methods=('GET',))
 def image(uid, eid):
-    print(type(uid), type(session['user_id']))
-    print(uid, session['user_id'])
-    if uid != session['user_id']:
-        abort(401)
+    #if uid != session['user_id']:
+    #    abort(401)
     b64 = ops.get_image(g.db, uid, eid)
     if b64 is None:
         abort(404)
@@ -71,7 +69,12 @@ def embeddings():
 def entries():
     # get the json of the request
     if request.method == 'GET':
-        return utils.jsonify_entries(g.db, session['user_id'])
+        entries = [dict(x) for x in ops.read_user(g.db, session['user_id'])]
+        for entry in entries:
+            entry['url'] = url_for('api.image', uid = session['user_id'], eid = entry['entry_id'])\
+                           if entry['is_image'] else ''
+        return {'entries': entries}
+
     
     elif request.method == 'DELETE':
         tgt = request.json['target']
@@ -88,7 +91,7 @@ def entries():
         return {'ok': True}
 
     elif request.method == 'POST':
-        is_text = request.json.get('is_text', True)
+        is_text = 'image' not in request.json
 
         if is_text:
             text = request.json['text']
@@ -98,9 +101,11 @@ def entries():
         else:
             image_input = request.json['image']
             is_url = request.json['is_url']
-            result = images.process(content, is_url)
+            result = images.process(image_input, is_url)
+            embedding = embed(result['description'])
             ops.create_image_entry(g.db, session['user_id'], mini_b64 = result['mini_b64'],
-                                  height = result['height'], width = result['width'])
+                                  height = result['height'], width = result['width'],
+                                  description = result['description'], embedding = embedding)
             
         return {'ok': True}
 
