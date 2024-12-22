@@ -2,22 +2,26 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { Typography, Box, CircularProgress } from '@mui/material'
 import { useEmbeddings } from '../contexts/EmbeddingsContext'
 import { useWaiting } from '../contexts/StateContext'
-import { create, sync, remove, update } from '../crud.js'
+import { createText, removeEntry, updateEntry,
+	lookupEntry, syncEntries, syncAll } from '../crud.js'
 
 import { TextField, IconButton } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from '@mui/icons-material/CheckCircleOutline';
-import { resolveId } from '../utils.js'
+
 
 function InputAreaHeader() {
     const [waiting, setWaiting] = useWaiting()
+	console.log(waiting)
     return (<>
+	{waiting}
     </>)
 }
 
 function InputAreaFooter() {
+	const [waiting, setWaiting] = useWaiting()
     return (<>
         <Typography variant='h6' align='center'>
         </Typography>
@@ -28,21 +32,25 @@ export default function InputArea() {
     const inputRef = useRef(null)
     const editRef = useRef(null)
     const [waiting, setWaiting] = useWaiting()
-    const [estate, setEstate] = useEmbeddings()
+    const {estate, setEntries, setPCA} = useEmbeddings()
     const [focused, setFocused] = useState(null)
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { sync(setWaiting, setEstate) }, [])
+	useEffect(() => {
+		syncAll(setEntries, setPCA)
+	}, [])
 
     const onAdd = () => {
-        create(inputRef.current.value, setWaiting, setEstate)
+        createText(inputRef.current.value).then(() => syncAll(setEntries, setPCA))
         inputRef.current.value = ''
     }
     const onEdit = () => {
-        update(editRef.current.value, focused, setWaiting, setEstate)
+        updateEntry(editRef.current.value, focused).then(() => syncAll(setEntries, setPCA))
 		setFocused(null)
 		editRef.current.value = null
     }
+	const onRemove = (id) => {
+		removeEntry(id).then(() => syncAll(setEntries, setPCA))
+	}
 
 
     return (
@@ -77,12 +85,12 @@ export default function InputArea() {
                 gridAutoFlow: 'rows',
                 flexGrow: 1
             }}>
-                {estate.ids.map((id, i) => {
-                    return focused === id ? (
-						 <Fragment key={id}>
+                {estate.entries.map((entry, i) => {
+                    return focused === entry.entry_id ? (
+						 <Fragment key={entry.entry_id}>
 							<input style={{ gridColumn: 'span 2'}}
 									   ref={editRef}
-									   defaultValue={resolveId(id, estate).text}></input>
+									   defaultValue={entry.content}></input>
 							<IconButton color='primary' disabled={waiting}
 								onClick={onEdit}>
 								<CheckIcon />
@@ -91,16 +99,16 @@ export default function InputArea() {
 					)
 					:
 					(
-                        <Fragment key={id}>
+                        <Fragment key={entry.entry_id}>
                             <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                                {resolveId(id, estate).text}
+                                {entry.content}
                             </Typography>
                             <IconButton color='primary' disabled={waiting}
-                                onClick={() => setFocused(id)}>
+                                onClick={() => setFocused(entry.entry_id)}>
                                 <EditIcon />
                             </IconButton>
                             <IconButton color='error' disabled={waiting}
-                                onClick={() => remove(id, setWaiting, setEstate)}>
+                                onClick={() => onRemove(entry.entry_id)}>
                                 <DeleteIcon />
                             </IconButton>
                         </Fragment>

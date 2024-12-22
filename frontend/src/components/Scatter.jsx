@@ -17,7 +17,7 @@ const initialData = {
 export default function Scatter() {
     const plotRef = useRef(null); // Reference to the plot div
     const layoutRef = useRef(initialLayout); // Reference to the current layout state
-    const [estate, setEstate] = useEmbeddings(); // Your custom hook
+    const {estate} = useEmbeddings(); // Your custom hook
     const [data, setData] = useState(null)
 
     // Update data based on estate
@@ -25,12 +25,12 @@ export default function Scatter() {
         const newData = [
             {
                 ...initialData,
-                x: estate.embeddings[0],
-                y: estate.embeddings[1],
-                customdata: estate.texts.map((s) =>
-                    s.length > 10 ? s.slice(0, 10) + "..." : s
+                x: estate.pca[0],
+                y: estate.pca[1],
+                customdata: estate.entries.map((entry) =>
+                    entry.content.length > 10 ? entry.content.slice(0, 10) + "..." : entry.content
                 ),
-                text: estate.ids.map((s) => `#${s}`),
+                text: estate.entries.map((entry) => `#${entry.entry_id}`),
             },
         ]
 
