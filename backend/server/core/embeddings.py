@@ -1,16 +1,9 @@
-import requests
-import os
-
-OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
+from .api_calls import invoke_openai
 
 def embed(text):
-    return requests.post('https://api.openai.com/v1/embeddings',
-        json = {
-            'model': 'text-embedding-3-small',
-            'dimensions': 256,
-            'input': text
-        },
-        headers = {
-            'Authorization': f'Bearer {OPENAI_API_KEY}'
-        }
-    ).json()['data'][0]['embedding']
+    resp = invoke_openai('/embeddings', {
+        'model': 'text-embedding-3-small',
+        'input': text
+    })
+
+    return resp['data'][0]['embedding']

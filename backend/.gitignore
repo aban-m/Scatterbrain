@@ -7,8 +7,7 @@ wheels/
 *.egg-info
 
 # Data
-flask_session/
-_scatterbrain_sessions/
+*.db
 
 # Virtual environments
 .venv

@@ -15,9 +15,9 @@ def pca(X, n_components = 2):
     """
     match len(X):
         case 0:
-            return [[]]
+            return np.array([])
         case 1:
-            return [[0.0], [0.0]]
+            return np.array([[0.0, 0.0]])
     # Step 1: Standardize the data (mean = 0, variance = 1)
     X_meaned = X - np.mean(X, axis=0)
 
@@ -38,4 +38,4 @@ def pca(X, n_components = 2):
     # Step 6: Project data onto the principal components
     X_pca = np.dot(X_meaned, selected_vectors)
 
-    return X_pca.T.tolist()
+    return X_pca
