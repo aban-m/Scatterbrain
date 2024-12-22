@@ -20,14 +20,19 @@ export function apiCall(method, endpoint, payload) {
     ).then((resp) => resp.json())
 }
 
-export function syncPCA(setWaiting, setPCA) {
+export function syncPCA(setPCA) {
 	return apiCall('GET', '/pca', {})
 		.then((data) => setPCA(data.pca))
 }
 
-export function syncEntries(setWaiting, setEntries) {
+export function syncEntries(setEntries) {
 	return apiCall('GET', '/entries', {})
 		.then((data) => setEntries(data.entries))
+}
+
+export function syncAll(setEntries, setPCA) {
+	syncEntries(setEntries)
+	syncPCA(setPCA)
 }
 
 export function createText(text) {
