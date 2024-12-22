@@ -65,27 +65,33 @@ def pca():
 def embeddings():
     return {'embeddings': ops.read_matrix(g.db, session['user_id'], pca = False)}
 
-@bp.route('/entries', methods=('POST','GET', 'DELETE', 'PATCH'))
-def entries():
+@bp.route('/entries', methods=('GET', 'DELETE', 'POST'))
+@bp.route('/entries/<int:eid>', methods=('GET', 'PATCH', 'DELETE'))
+def entries(eid=None):
     # get the json of the request
     if request.method == 'GET':
-        entries = [dict(x) for x in ops.read_user(g.db, session['user_id'])]
-        for entry in entries:
+        if eid is None:
+            entries = [dict(x) for x in ops.read_user(g.db, session['user_id'])]
+            for entry in entries:
+                entry['url'] = url_for('api.image', uid = session['user_id'], eid = entry['entry_id'])\
+                               if entry['is_image'] else ''
+            return {'entries': entries}
+        else:
+            entry = ops.read_entry(g.db, session['user_id'], eid)
             entry['url'] = url_for('api.image', uid = session['user_id'], eid = entry['entry_id'])\
-                           if entry['is_image'] else ''
-        return {'entries': entries}
+                               if entry['is_image'] else ''
+            return entry
 
     
     elif request.method == 'DELETE':
-        tgt = request.json['target']
-        if tgt == 'all':
+        if eid is None:
             ops.delete_entries(g.db, session['user_id'])
         else:
-            ops.delete_entry(g.db, session['user_id'], tgt)
+            ops.delete_entry(g.db, session['user_id'], eid)
         return {'ok': True}
             
     elif request.method == 'PATCH':
-        tgt, new_text = request.json['target'], request.json['new']
+        tgt, new_text = eid, request.json['new']
         new_embedding = embed(new_text)
         ops.update_entry(g.db, session['user_id'], tgt, new_text, new_embedding)
         return {'ok': True}

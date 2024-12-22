@@ -117,3 +117,8 @@ def read_matrix(conn, user_id: str, pca: bool):
 def read_user(conn, user_id: str):
     data = conn.execute('SELECT is_image, entry_id, content FROM entries WHERE user_id = ?', (user_id,)).fetchall()
     return data if data else []
+
+def read_entry(conn, user_id: str, entry_id: int):
+    data = conn.execute(''''SELECT is_image, entry_id, content FROM entrie
+WHERE user_id = ? AND entry_id = ?''', (user_id, entry_id)).fetchone()
+    return data
