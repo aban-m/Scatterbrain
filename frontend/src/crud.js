@@ -1,38 +1,52 @@
-import { apiCall } from "./utils"
 
-export function _sync(setEstate) {
-    return apiCall('/pca', null, 'GET').then((r) => r.json())
-        .then((data) => setEstate(data))
+export const lookupEntry = (entries, id) => entries.find(item => item.entry_id === id);
+	// Unfortunately, it is O(n). We prefered the elegance of representation over the elegance of method.
+
+
+export function apiCall(method, endpoint, payload) {
+    const url = 'http://localhost:5000' +
+		`/api${endpoint}`
+    const body = (method == 'GET') ? {} : {
+        body: JSON.stringify(payload),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    return fetch(
+        url, {
+            ...body, method,
+            credentials: 'include',			// super-important
+        }
+    )
 }
 
-export function sync(setWaiting, setEstate) {
-    return declareStatus('Syncing...', setWaiting, () => _sync(setEstate))
+export function createText(text) {
+    return apiCall('POST', '/entries', { text: text })
 }
 
-export function _create(text) {
-    return apiCall('/embeddings', { text: text }, 'POST')
+export function createImageFromFile({base64Data, filename, mimetype}) {
+	return apiCall('POST', '/entries', {
+		image: base64Data,
+		is_url: false,
+		context: {filename, mimetype}
+	})
+}
+export function createImageFromUrl(url) {
+	return apiCall('POST', '/entries', {
+		image: url,
+		is_url: true,
+		context: {}
+	})
 }
 
-export function _update(text, id) {
-    return apiCall('/embeddings', { new: text, target: id }, 'PATCH')
+export function updateEntry(text, id) {
+    return apiCall('PATCH', `/entries/${id}`, { text: text })
 }
 
-export function _remove(id) {
-    return apiCall('/embeddings', { target: id }, 'DELETE')
-}
-export function remove(id, setWaiting, setEstate) {
-    return declareStatus('Deleting...', setWaiting, () => _remove(id)).then(() => sync(setWaiting, setEstate))
+export function removeEntry(id) {
+    return apiCall('DELETE', `/entries/${id}`)
 }
 
-export function update(text, id, setWaiting, setEstate) {
-    return declareStatus('Updating...', setWaiting, () => _update(text, id)).then(() => sync(setWaiting, setEstate))
-}
-
-export function create(text, setWaiting, setEstate) {
-    return declareStatus('Adding...', setWaiting, () => _create(text)).then(() => sync(setWaiting, setEstate))
-}
-
-export function declareStatus(state, setWaiting, callback) {
-    setWaiting(state)
-    return callback().then(() => setWaiting(''))
+export function removeEntries() {
+	return apiCall('DELETE', '/entries', {})
 }
