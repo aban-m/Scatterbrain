@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import Plotly from "plotly.js-basic-dist"
 import { useEmbeddings } from "../contexts/EmbeddingsContext"
+import { useWaiting } from "../contexts/StateContext"
 const initialLayout = {
     xaxis: { range: [-1, 1], autorange: false },
     yaxis: { range: [-1, 1], autorange: false },
@@ -12,6 +13,7 @@ const initialData = {
     mode: "markers+text",
     hovertemplate: "%{customdata}<extra></extra>",
     textposition: "bottom center",
+	marker: { size: 10, color: 'blue'}
 }
 
 export default function Scatter() {
@@ -19,7 +21,7 @@ export default function Scatter() {
     const layoutRef = useRef(initialLayout); // Reference to the current layout state
     const {estate} = useEmbeddings(); // Your custom hook
     const [data, setData] = useState(null)
-
+	const {hoveredId, setHoveredId, waiting} = useWaiting()
     // Update data based on estate
     useEffect(() => {
         const newData = [
@@ -28,7 +30,9 @@ export default function Scatter() {
                 x: estate.pca[0],
                 y: estate.pca[1],
                 customdata: estate.entries.map((entry) =>
-                    entry.content.length > 10 ? entry.content.slice(0, 10) + "..." : entry.content
+                    entry.content.length > 120 ? 
+						(entry.content.slice(0, 80) + "... " +
+						entry.content.slice(entry.content.length-40, entry.content.length)) : entry.content
                 ),
                 text: estate.entries.map((entry) => `#${entry.entry_id}`),
             },
@@ -54,8 +58,26 @@ export default function Scatter() {
                 layoutRef.current = { ...layoutRef.current, ...updatedLayout }
             })
         }
+		
+		plotRef.current.on('plotly_hover', (e) => {
+			setHoveredId(parseInt(e.points[0].text.slice(1)))
+		}).on('plotly_unhover', (e) => {
+			setHoveredId(null)
+		})
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+	
+	useEffect(() => {
+		// Create the color and size arrays
+		const colorArray = [...Array(estate.entries.length).keys()].map(i => (i + 1 === hoveredId ? '#a3d9a5' : 'blue'));
+		const sizeArray = [...Array(estate.entries.length).keys()].map(i => (i + 1 === hoveredId ? 20 : 10));
+		
+		// Batch the restyle calls
+		Plotly.restyle(plotRef.current, {
+			'marker.color': [colorArray],
+			'marker.size': [sizeArray],
+		});
+	}, [hoveredId]);
 
     return (
         <div style={{ height: "100%", width: "100%", margin: 5 }}>
