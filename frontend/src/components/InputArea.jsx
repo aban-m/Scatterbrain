@@ -5,9 +5,9 @@ import { useEmbeddings } from '../contexts/EmbeddingsContext'
 import { useWaiting } from '../contexts/StateContext'
 import {
     createText, removeEntry, updateEntry,
+	createImageFromFile, declareStatus,
     lookupEntry, syncEntries, syncAll,
-    apiCall,
-    apiBase
+    apiCall, apiBase
 } from '../crud.js'
 
 import { TextField, IconButton } from "@mui/material";
@@ -18,8 +18,9 @@ import Tooltip from '@mui/material/Tooltip'
 import CheckIcon from '@mui/icons-material/CheckCircleOutline';
 import PhotoCameraBackIcon from '@mui/icons-material/PhotoCameraBack';
 
-function InputAreaHeader() {
+function InputAreaHeader({waiting}) {
     return (<>
+		<p>{waiting}</p>
     </>)
 }
 
@@ -30,43 +31,58 @@ function InputAreaFooter() {
     </>)
 }
 
-function InputField({ waiting }) {
-    const [isText, setIsText] = useState(true)
+function InputField({ waiting, setWaiting, setPCA, setEntries }) {
     const inputRef = useRef(null)
+	const fileRef = useRef(null)
 
     const onAdd = () => {
-        createText(inputRef.current.value)
+		if (!inputRef.current.value) {
+			inputRef.current.focus();
+			return;
+		}
+		declareStatus(setWaiting, 'Embedding text...', 'Critical error!',
+			() => createText(inputRef.current.value)).then(() => syncAll({setPCA, setEntries}))
         inputRef.current.value = ''
     }
+	
+	const handleFileChange = async (event) => {
+		const file = event.target.files[0];
+		if (!file) return;
 
+		const reader = new FileReader();
+		reader.onload = () => {
+		    const base64Data = reader.result.split(",")[1] // Extract base64 data
+			declareStatus(setWaiting, 'Uploading image...', 'Image upload failed.',
+						() => createImageFromFile({base64Data})).then(() => syncAll({setPCA, setEntries}))
+		};
+		
+		reader.readAsDataURL(file);
+		setWaiting('Processing image...')
+	  };
+	  
     return (
         <>
-            {
-                isText ?
-                    (<TextField
-                        variant="outlined"
-                        placeholder="Enter text"
-                        inputRef={inputRef}
-                        fullWidth />) : (
-                        <>
-
-                        </>
-                    )
-            }
-
+            <TextField
+                    variant="outlined"
+                    placeholder="Enter text"
+                    inputRef={inputRef}
+                    fullWidth />
+                
             {
                 waiting ? (<CircularProgress />) : (
                     <>
                         <IconButton
                             color="primary" disabled={waiting}
-                            onClick={onAdd} // Calls the provided handler
+                            onClick={onAdd} 
                         >
                             <AddCircleIcon />
                         </IconButton>
+						<input type="file" ref={fileRef} id='photo-upload' style={{ display: 'none' }} 
+							onChange={handleFileChange} accept='image/*' />
                         <Tooltip title='Add photo' arrow>
                             <IconButton
                                 color="primary" disabled={waiting}
-                                onClick={() => setIsText(false)}>
+                                onClick={() => fileRef.current.click()}>
                                 <PhotoCameraBackIcon />
                             </IconButton>
                         </Tooltip>
@@ -77,7 +93,11 @@ function InputField({ waiting }) {
     )
 }
 
-function TextEntry({ entry, setFocused, waiting }) {
+function TextEntry({ entry, setFocused, waiting, setWaiting, setPCA, setEntries }) {
+	const onRemove = () => {
+		declareStatus(setWaiting, `Removing #${entry.entry_id}...`, 'Critical error!', () => 
+		removeEntry(entry.entry_id)).then(() => syncAll({setPCA, setEntries}))
+	}
     return (
         <>
             <Typography sx={{ display: 'flex', alignItems: 'center' }}>
@@ -88,7 +108,7 @@ function TextEntry({ entry, setFocused, waiting }) {
                 <EditIcon />
             </IconButton>
             <IconButton color='error' disabled={waiting}
-                onClick={() => removeEntry(entry.entry_id)}>
+                onClick={onRemove}>
                 <DeleteIcon />
             </IconButton>
         </>
@@ -102,7 +122,6 @@ function PhotoEntry({ entry, setFocused, waiting }) {
                 <img src={apiBase() + entry.url} style={{
                     gridColumn: 'span 3', gridRow: 'span 6',
                     objectFit: 'cover'
-
                 }} />
 
             </Tooltip>
@@ -110,10 +129,11 @@ function PhotoEntry({ entry, setFocused, waiting }) {
     )
 }
 
-function TextEntryEdit({ entry, waiting, setFocused }) {
+function TextEntryEdit({ entry, waiting, setWaiting, setFocused }) {
     const editRef = useRef(null)
     const onEdit = () => {
-        updateEntry(editRef.current.value, entry.entry_id)
+		setWaiting('Updating...')
+        updateEntry(editRef.current.value, entry.entry_id).then(() => setWaiting(''))
         setFocused(null)
         editRef.current.value = null
     }
@@ -137,8 +157,8 @@ function PhotoEntryEdit({ entry, waiting, setFocused }) {
     </>)
 }
 
-function Entry({ entry, waiting, setFocused }) {
-    return !entry.is_image ? TextEntry({ entry, waiting, setFocused }) : PhotoEntry({ entry, waiting, setFocused })
+function Entry(props) {
+    return !props.entry.is_image ? TextEntry(props) : PhotoEntry(props)
 }
 function EntryEdit({ entry, waiting, setFocused }) {
     return !entry.is_image ? TextEntryEdit({ entry, waiting, setFocused }) : PhotoEntryEdit({ entry, waiting, setFocused })
@@ -150,20 +170,20 @@ export default function InputArea() {
     const [focused, setFocused] = useState(null)
 
     useEffect(() => {
-        setWaiting('Syncing...')
-        syncAll(setEntries, setPCA).then(() => setWaiting(''))
+        declareStatus(setWaiting, 'Syncing...', 'Critical error!', 
+					() => syncAll({setEntries, setPCA}))
     }, [])
 
     return (
         <>
             {/* Header */}
             <Box sx={{ borderBottom: "1px solid #ccc" }}>
-                <InputAreaHeader />
+                <InputAreaHeader waiting={waiting}/>
             </Box>
 
             {/* Text Input and Add Button */}
             <Box sx={{ my: 3, display: "flex", gap: 1 }}>
-                <InputField setEntries={setEntries} setPCA={setPCA} waiting={waiting} />
+                <InputField {... {waiting, setWaiting, setPCA, setEntries}} />
             </Box>
 
             {/* List of TextElements */}
@@ -177,9 +197,9 @@ export default function InputArea() {
                 {estate.entries.map((entry, i) => (
                     <Fragment key={entry.entry_id}>
                         {focused === entry.entry_id ? (
-                            <EntryEdit waiting={waiting} entry={entry} setFocused={setFocused} />
+                            <EntryEdit {... {entry, waiting, setWaiting, setPCA, setEntries, setFocused}} />
                         ) : (
-                            <Entry waiting={waiting} entry={entry} setFocused={setFocused} />
+                            <Entry {... {entry, waiting, setWaiting, setPCA, setEntries, setFocused}} />
                         )
                         }
                     </Fragment>

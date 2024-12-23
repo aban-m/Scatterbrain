@@ -28,7 +28,9 @@ export default function Scatter() {
                 x: estate.pca[0],
                 y: estate.pca[1],
                 customdata: estate.entries.map((entry) =>
-                    entry.content.length > 10 ? entry.content.slice(0, 10) + "..." : entry.content
+                    entry.content.length > 120 ? 
+						(entry.content.slice(0, 80) + "... " +
+						entry.content.slice(entry.content.length-40, entry.content.length)) : entry.content
                 ),
                 text: estate.entries.map((entry) => `#${entry.entry_id}`),
             },
