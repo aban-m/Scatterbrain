@@ -1,4 +1,6 @@
+import logging
 import base64
+import json
 from io import BytesIO
 from PIL import Image
 import requests
@@ -15,6 +17,13 @@ config = {
     'prompt': '''Give a thorough description of the following image, focusing on the main aspects.''',
     'thumbnail_size': (200, 200)
 }
+
+try:
+    with open('server/config.json') as fp:
+        image_config = json.load(fp)['images']
+    config.update(image_config)
+except Exception as e:
+    logging.warn(f'Images: Failed with {e}. Defaulting to basic config.')         # TODO: Add consistent logging in the future
 
 def describe(image: str, is_url: bool, format: str = 'image/jpeg'):
     '''
