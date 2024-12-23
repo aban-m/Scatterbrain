@@ -27,6 +27,7 @@ function InputAreaHeader({waiting}) {
 function InputAreaFooter() {
     return (<>
         <Typography variant='h6' align='center'>
+			Footer
         </Typography>
     </>)
 }
@@ -39,6 +40,7 @@ function InputField({ waiting, setWaiting, setPCA, setEntries }) {
 		if (!inputRef.current.value) {
 			inputRef.current.focus();
 			return;
+
 		}
 		declareStatus(setWaiting, 'Embedding text...', 'Critical error!',
 			() => createText(inputRef.current.value)).then(() => syncAll({setPCA, setEntries}))
@@ -117,15 +119,13 @@ function TextEntry({ entry, setFocused, waiting, setWaiting, setPCA, setEntries 
 
 function PhotoEntry({ entry, setFocused, waiting }) {
     return (
-        <>
+        <Box className="photo-entry" style={{ 
+			borderStyle: '1px solid #ccc', p: 1,
+            gridColumn: 'span 3', gridRow: 'span 6'}}>
             <Tooltip title={entry.content.substring(0, 120) + '...'}>
-                <img src={apiBase() + entry.url} style={{
-                    gridColumn: 'span 3', gridRow: 'span 6',
-                    objectFit: 'cover'
-                }} />
-
+                <img src={apiBase() + entry.url} style={{ objectFit: 'cover' }} />
             </Tooltip>
-        </>
+        </Box>
     )
 }
 
@@ -189,7 +189,7 @@ export default function InputArea() {
             {/* List of TextElements */}
             <Box sx={{
                 display: 'grid',
-                gridTemplateColumns: '6fr 1fr 1fr',
+                gridTemplateColumns: '7fr 1fr 1fr',
                 gridAutoRows: '3em',
                 gridAutoFlow: 'rows',
                 flexGrow: 1
@@ -205,11 +205,6 @@ export default function InputArea() {
                     </Fragment>
                 ))}
 
-            </Box>
-
-            {/* Footer */}
-            <Box sx={{ p: 2, borderTop: '1px solid #ccc', justifySelf: 'flex-end' }}>
-                <InputAreaFooter />
             </Box>
         </>
     )
