@@ -34,7 +34,7 @@ export function syncEntries(setEntries) {
 		.then((data) => setEntries(data.entries))
 }
 
-export function syncAll(setEntries, setPCA) {
+export function syncAll({setEntries, setPCA}) {
 	return Promise.all([syncEntries(setEntries),
 	syncPCA(setPCA)])
 }
@@ -68,4 +68,12 @@ export function removeEntry(id) {
 
 export function removeEntries() {
 	return apiCall('DELETE', '/entries', {})
+}
+
+export function declareStatus(setWaiting, status, failMsg, callback) {
+	setWaiting(status)
+	return callback().then(() => setWaiting('')).catch(() => {
+		alert(failMsg)				// I should probably add more
+		setWaiting('')				// Free it anyways
+	})
 }

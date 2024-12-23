@@ -32,10 +32,22 @@ function InputAreaFooter() {
     </>)
 }
 
-function InputField({ waiting, setWaiting, setPCA, setEntries }) {
+function FocusableDiv({hoveredId, setHoveredId, entry, children, style, props}) {
+	return (
+		<div onMouseOver={(e) => {e.target.style.opacity='0.5'; setHoveredId(entry.entry_id)}}
+			onMouseOut={(e) => {e.target.style.opacity='1'; setHoveredId(null)}}
+			style={{ borderWidth: entry.entry_id === hoveredId ? '5px' : '0px', ...style,
+			borderStyle: 'solid', borderColor: '#a3d9a5', borderRadius: '2px' }}>
+		{children}
+		</div>
+	)
+}
+
+function InputField({ setPCA, setEntries }) {
     const inputRef = useRef(null)
 	const fileRef = useRef(null)
-
+	const { waiting, setWaiting } = useWaiting()
+	
     const onAdd = () => {
 		if (!inputRef.current.value) {
 			inputRef.current.focus();
@@ -95,16 +107,23 @@ function InputField({ waiting, setWaiting, setPCA, setEntries }) {
     )
 }
 
-function TextEntry({ entry, setFocused, waiting, setWaiting, setPCA, setEntries }) {
+function TextEntry({ entry, setFocused, setPCA, setEntries }) {
+	const { waiting, setWaiting, hoveredId, setHoveredId } = useWaiting()
+
 	const onRemove = () => {
 		declareStatus(setWaiting, `Removing #${entry.entry_id}...`, 'Critical error!', () => 
 		removeEntry(entry.entry_id)).then(() => syncAll({setPCA, setEntries}))
 	}
     return (
         <>
-            <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                {entry.content}
-            </Typography>
+			<Typography sx={{ display: 'flex', alignItems: 'center' }}>
+				{entry.entry_id}
+			</Typography>
+			<FocusableDiv {...{hoveredId, setHoveredId, entry}}>
+				<Typography sx={{ display: 'flex', alignItems: 'center' }} id={`entry-${entry.entry_id}`}>
+					{entry.content}
+				</Typography>
+			</FocusableDiv>
             <IconButton color='primary' disabled={waiting}
                 onClick={() => setFocused(entry.entry_id)}>
                 <EditIcon />
@@ -117,26 +136,34 @@ function TextEntry({ entry, setFocused, waiting, setWaiting, setPCA, setEntries 
     )
 }
 
-function PhotoEntry({ entry, setFocused, waiting }) {
+function PhotoEntry({ entry, setFocused }) {
+	const { waiting, hoveredId, setHoveredId } = useWaiting()
+	
     return (
-        <Box className="photo-entry" style={{ 
+		<FocusableDiv {...{hoveredId, setHoveredId, entry}}
+			style={{
 			borderStyle: '1px solid #ccc', p: 1,
-            gridColumn: 'span 3', gridRow: 'span 6'}}>
-            <Tooltip title={entry.content.substring(0, 120) + '...'}>
-                <img src={apiBase() + entry.url} style={{ objectFit: 'cover' }} />
-            </Tooltip>
-        </Box>
+			gridColumn: 'span 4', gridRow: 'span 6'	
+		}}>
+			<Tooltip title={entry.content.substring(0, 120) + '...'}>
+				<img src={apiBase() + entry.url} style={{ objectFit: 'cover' }} id={`entry-${entry.entry_id}`}
+					
+				/>
+			</Tooltip>
+		</FocusableDiv>
     )
 }
 
-function TextEntryEdit({ entry, waiting, setWaiting, setFocused }) {
+function TextEntryEdit({ entry,  setFocused, setPCA, setEntries }) {
+	const { waiting, setWaiting } = useWaiting()
     const editRef = useRef(null)
     const onEdit = () => {
-		setWaiting('Updating...')
-        updateEntry(editRef.current.value, entry.entry_id).then(() => setWaiting(''))
-        setFocused(null)
-        editRef.current.value = null
-    }
+        declareStatus(setWaiting, 'Updating...', 'Critical error!',
+			() => updateEntry(editRef.current.value, entry.entry_id)).then(() => {
+			setFocused(null)
+			editRef.current.value = null
+			}).then(() => syncAll({setPCA, setEntries}))
+	}
 
     return (
         <>
@@ -151,7 +178,7 @@ function TextEntryEdit({ entry, waiting, setWaiting, setFocused }) {
     )
 }
 
-function PhotoEntryEdit({ entry, waiting, setFocused }) {
+function PhotoEntryEdit({ entry, setFocused }) {
     return (<>
 
     </>)
@@ -160,12 +187,12 @@ function PhotoEntryEdit({ entry, waiting, setFocused }) {
 function Entry(props) {
     return !props.entry.is_image ? TextEntry(props) : PhotoEntry(props)
 }
-function EntryEdit({ entry, waiting, setFocused }) {
-    return !entry.is_image ? TextEntryEdit({ entry, waiting, setFocused }) : PhotoEntryEdit({ entry, waiting, setFocused })
+function EntryEdit(props) {
+    return !props.entry.is_image ? TextEntryEdit(props) : PhotoEntryEdit(props)
 }
 
 export default function InputArea() {
-    const [waiting, setWaiting] = useWaiting()
+    const { waiting, setWaiting, hoveredId } = useWaiting()
     const { estate, setEntries, setPCA } = useEmbeddings()
     const [focused, setFocused] = useState(null)
 
@@ -173,6 +200,16 @@ export default function InputArea() {
         declareStatus(setWaiting, 'Syncing...', 'Critical error!', 
 					() => syncAll({setEntries, setPCA}))
     }, [])
+	
+	useEffect(() => {
+		const el = document.getElementById(`entry-${hoveredId}`)
+		if (el) { 
+			el.scrollIntoView({
+				scrollingBehavior: 'smooth',
+				block: 'center'
+			})
+		}
+	}, [hoveredId])
 
     return (
         <>
@@ -183,13 +220,13 @@ export default function InputArea() {
 
             {/* Text Input and Add Button */}
             <Box sx={{ my: 3, display: "flex", gap: 1 }}>
-                <InputField {... {waiting, setWaiting, setPCA, setEntries}} />
+                <InputField {... {setPCA, setEntries}} />
             </Box>
 
             {/* List of TextElements */}
             <Box sx={{
                 display: 'grid',
-                gridTemplateColumns: '7fr 1fr 1fr',
+                gridTemplateColumns: '1fr 7fr 1fr 1fr',
                 gridAutoRows: '3em',
                 gridAutoFlow: 'rows',
                 flexGrow: 1
@@ -197,9 +234,9 @@ export default function InputArea() {
                 {estate.entries.map((entry, i) => (
                     <Fragment key={entry.entry_id}>
                         {focused === entry.entry_id ? (
-                            <EntryEdit {... {entry, waiting, setWaiting, setPCA, setEntries, setFocused}} />
+                            <EntryEdit {... {entry, setPCA, setEntries, setFocused}} />
                         ) : (
-                            <Entry {... {entry, waiting, setWaiting, setPCA, setEntries, setFocused}} />
+                            <Entry {... {entry, setPCA, setEntries, setFocused}} />
                         )
                         }
                     </Fragment>
