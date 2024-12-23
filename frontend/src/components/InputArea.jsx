@@ -20,24 +20,24 @@ import PhotoCameraBackIcon from '@mui/icons-material/PhotoCameraBack';
 
 function InputAreaHeader({waiting}) {
     return (<>
-		<p>{waiting}</p>
+		<p>{waiting ? waiting : 'Ready'}</p>
     </>)
 }
 
 function InputAreaFooter() {
     return (<>
-        <Typography variant='h6' align='center'>
-			Footer
-        </Typography>
     </>)
 }
 
-function FocusableDiv({hoveredId, setHoveredId, entry, children, style, props}) {
+function FocusableDiv({hoveredId, setHoveredId, entry, children, style}) {
 	return (
-		<div onMouseOver={(e) => {e.target.style.opacity='0.5'; setHoveredId(entry.entry_id)}}
+		<div onMouseOver={(e) => {e.target.style.opacity='0.9'; setHoveredId(entry.entry_id)}}
 			onMouseOut={(e) => {e.target.style.opacity='1'; setHoveredId(null)}}
-			style={{ borderWidth: entry.entry_id === hoveredId ? '5px' : '0px', ...style,
-			borderStyle: 'solid', borderColor: '#a3d9a5', borderRadius: '2px' }}>
+			style={{ borderWidth: entry.entry_id === hoveredId ? '5px' : '0px',
+			borderStyle: 'solid', borderColor: '#a3d9a5', borderRadius: '2px',
+			transition: 'all 0.15s ease-in-out',
+			display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1',
+			...style}}>
 		{children}
 		</div>
 	)
@@ -116,13 +116,13 @@ function TextEntry({ entry, setFocused, setPCA, setEntries }) {
 	}
     return (
         <>
-			<Typography sx={{ display: 'flex', alignItems: 'center' }}>
+			<p style={{ display: 'flex', alignItems: 'center' }}>
 				{entry.entry_id}
-			</Typography>
+			</p>
 			<FocusableDiv {...{hoveredId, setHoveredId, entry}}>
-				<Typography sx={{ display: 'flex', alignItems: 'center' }} id={`entry-${entry.entry_id}`}>
+				<p style={{ display: 'flex', alignItems: 'center' }} id={`entry-${entry.entry_id}`}>
 					{entry.content}
-				</Typography>
+				</p>
 			</FocusableDiv>
             <IconButton color='primary' disabled={waiting}
                 onClick={() => setFocused(entry.entry_id)}>
@@ -136,21 +136,32 @@ function TextEntry({ entry, setFocused, setPCA, setEntries }) {
     )
 }
 
-function PhotoEntry({ entry, setFocused }) {
-	const { waiting, hoveredId, setHoveredId } = useWaiting()
+function PhotoEntry({ entry, setFocused, setPCA, setEntries }) {
+	const { waiting, setWaiting, hoveredId, setHoveredId } = useWaiting()
+	const onRemove = () => {
+		declareStatus(setWaiting, `Removing #${entry.entry_id}...`, 'Critical error!', () => 
+		removeEntry(entry.entry_id)).then(() => syncAll({setPCA, setEntries}))
+	}
 	
     return (
+	<>
+		<p style={{ display: 'flex', alignItems: 'center'}}>
+				{entry.entry_id}
+		</p>
 		<FocusableDiv {...{hoveredId, setHoveredId, entry}}
 			style={{
 			borderStyle: '1px solid #ccc', p: 1,
-			gridColumn: 'span 4', gridRow: 'span 6'	
+			gridColumn: 'span 2'
 		}}>
 			<Tooltip title={entry.content.substring(0, 120) + '...'}>
-				<img src={apiBase() + entry.url} style={{ objectFit: 'cover' }} id={`entry-${entry.entry_id}`}
-					
-				/>
+				<img src={apiBase() + entry.url} style={{ objectFit: 'cover' }} id={`entry-${entry.entry_id}`} />
 			</Tooltip>
 		</FocusableDiv>
+         <IconButton color='error' disabled={waiting}
+				onClick={onRemove}>
+            <DeleteIcon />
+	     </IconButton>		
+		</>
     )
 }
 
@@ -226,18 +237,15 @@ export default function InputArea() {
             {/* List of TextElements */}
             <Box sx={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 7fr 1fr 1fr',
-                gridAutoRows: '3em',
-                gridAutoFlow: 'rows',
-                flexGrow: 1
+                gridTemplateColumns: '1fr 8fr 2fr 2fr',
+				gridTemplateRows: 'minmax(10pt, auto)',
+                gridAutoFlow: 'rows'
             }}>
                 {estate.entries.map((entry, i) => (
                     <Fragment key={entry.entry_id}>
-                        {focused === entry.entry_id ? (
-                            <EntryEdit {... {entry, setPCA, setEntries, setFocused}} />
-                        ) : (
-                            <Entry {... {entry, setPCA, setEntries, setFocused}} />
-                        )
+                        {focused === entry.entry_id ? 
+                            (<EntryEdit {... {entry, setPCA, setEntries, setFocused}} />)
+                          : (<Entry {... {entry, setPCA, setEntries, setFocused}} />)
                         }
                     </Fragment>
                 ))}
