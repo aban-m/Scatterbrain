@@ -1,0 +1,1 @@
+ALTER TABLE Users ADD COLUMN ip_addr VARCHAR(50);
