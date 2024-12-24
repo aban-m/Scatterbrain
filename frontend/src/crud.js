@@ -1,15 +1,10 @@
 
-export const lookupEntry = (entries, id) => entries.find(item => item.entry_id === id);
-// Unfortunately, it is O(n). We prefered the elegance of representation over the elegance of method.
-
-export function apiBase() {
-	return (import.meta.env.MODE === 'development' ?
-		'http://localhost:5000' :
-		'https://abanm.pythonanywhere.com')
-}
+export const API_HOST = import.meta.env.VITE_API_HOST
+export const API_BASE = API_HOST + '/api'
 
 export function apiCall(method, endpoint, payload) {
-	const url = apiBase() + `/api${endpoint}`
+	console.log(import.meta.env)
+	const url = `${API_BASE}${endpoint}`
 	const body = (method == 'GET') ? {} : {
 		body: JSON.stringify(payload),
 		headers: {
@@ -23,6 +18,10 @@ export function apiCall(method, endpoint, payload) {
 	}
 	).then((resp) => resp.json())
 }
+
+export const lookupEntry = (entries, id) => entries.find(item => item.entry_id === id);
+// Unfortunately, it is O(n). We prefered the elegance of representation over the elegance of method.
+
 
 export function syncPCA(setPCA) {
 	return apiCall('GET', '/pca', {})
