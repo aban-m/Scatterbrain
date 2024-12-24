@@ -1,6 +1,20 @@
 /* eslint-disable react/prop-types */
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { Typography, Box, CircularProgress } from '@mui/material'
+import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
+import IconButton from '@mui/material/IconButton'
+import CircularProgress from '@mui/material/CircularProgress'
+
+
+import AddCircleIcon from '@mui/icons-material/AddCircle'
+import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
+import Tooltip from '@mui/material/Tooltip'
+import CheckIcon from '@mui/icons-material/CheckCircleOutline'
+import PhotoCameraBackIcon from '@mui/icons-material/PhotoCameraBack'
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
+
 import { useEmbeddings } from '../contexts/EmbeddingsContext'
 import { useWaiting } from '../contexts/StateContext'
 import {
@@ -10,17 +24,19 @@ import {
     apiCall, apiBase
 } from '../crud.js'
 
-import { TextField, IconButton } from "@mui/material";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import Tooltip from '@mui/material/Tooltip'
-import CheckIcon from '@mui/icons-material/CheckCircleOutline';
-import PhotoCameraBackIcon from '@mui/icons-material/PhotoCameraBack';
-
 function InputAreaHeader({waiting}) {
+	const [visible, setVisible] = useState(false);
     return (<>
-		<p>{waiting ? waiting : 'Ready'}</p>
+	<Box sx={{ borderBottom: '1px solid #ccc', display: visible ? 'initial'  :'none' }}>
+		<p style={{fontSize: '1.1em'}}>This app allows you to visualize a 2D version of the embeddings of text.
+		You can also add a picture, where a description of it will be used as the text.</p>
+	</Box>
+	<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+	<p>{waiting ? waiting : 'Ready'}</p>
+	<IconButton onClick={() => setVisible(!visible)} color='primary'>
+		{!visible ? <QuestionMarkIcon /> : <CheckIcon />}
+	</IconButton>
+	</Box>
     </>)
 }
 
@@ -65,7 +81,7 @@ function InputField({ setPCA, setEntries }) {
 
 		const reader = new FileReader();
 		reader.onload = () => {
-		    const base64Data = reader.result.split(",")[1] // Extract base64 data
+		    const base64Data = reader.result.split(',')[1] // Extract base64 data
 			declareStatus(setWaiting, 'Uploading image...', 'Image upload failed.',
 						() => createImageFromFile({base64Data})).then(() => syncAll({setPCA, setEntries}))
 		};
@@ -77,8 +93,8 @@ function InputField({ setPCA, setEntries }) {
     return (
         <>
             <TextField
-                    variant="outlined"
-                    placeholder="Enter text"
+                    variant='outlined'
+                    placeholder='Enter text'
                     inputRef={inputRef}
                     fullWidth />
                 
@@ -86,16 +102,16 @@ function InputField({ setPCA, setEntries }) {
                 waiting ? (<CircularProgress />) : (
                     <>
                         <IconButton
-                            color="primary" disabled={waiting}
+                            color='primary' disabled={waiting}
                             onClick={onAdd} 
                         >
                             <AddCircleIcon />
                         </IconButton>
-						<input type="file" ref={fileRef} id='photo-upload' style={{ display: 'none' }} 
+						<input type='file' ref={fileRef} id='photo-upload' style={{ display: 'none' }} 
 							onChange={handleFileChange} accept='image/*' />
                         <Tooltip title='Add photo' arrow>
                             <IconButton
-                                color="primary" disabled={waiting}
+                                color='primary' disabled={waiting}
                                 onClick={() => fileRef.current.click()}>
                                 <PhotoCameraBackIcon />
                             </IconButton>
@@ -225,12 +241,12 @@ export default function InputArea() {
     return (
         <>
             {/* Header */}
-            <Box sx={{ borderBottom: "1px solid #ccc" }}>
+            <Box sx={{ borderBottom: '1px solid #ccc' }}>
                 <InputAreaHeader waiting={waiting}/>
             </Box>
 
             {/* Text Input and Add Button */}
-            <Box sx={{ my: 3, display: "flex", gap: 1 }}>
+            <Box sx={{ my: 3, display: 'flex', gap: 1 }}>
                 <InputField {... {setPCA, setEntries}} />
             </Box>
 

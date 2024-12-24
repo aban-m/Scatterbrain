@@ -1,6 +1,14 @@
+html, body {
+  height: 100%;
+  margin: 5px;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  height: calc(100% - 30px);
+  margin: 10px;
+  box-sizing: border-box;
 }

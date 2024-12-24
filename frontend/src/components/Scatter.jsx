@@ -1,18 +1,19 @@
-import React, { useEffect, useRef, useState } from "react"
-import Plotly from "plotly.js-basic-dist"
-import { useEmbeddings } from "../contexts/EmbeddingsContext"
-import { useWaiting } from "../contexts/StateContext"
+import React, { useEffect, useRef, useState } from 'react'
+import Plotly from 'plotly.js-basic-dist'
+import { useEmbeddings } from '../contexts/EmbeddingsContext'
+import { useWaiting } from '../contexts/StateContext'
 const initialLayout = {
     xaxis: { range: [-1, 1], autorange: false },
     yaxis: { range: [-1, 1], autorange: false },
     autosize: true,
+	title: { text: 'Scatterbrain β', font: { size: 20 } }
 }
 
 const initialData = {
-    type: "scatter",
-    mode: "markers+text",
-    hovertemplate: "%{customdata}<extra></extra>",
-    textposition: "bottom center",
+    type: 'scatter',
+    mode: 'markers+text',
+    hovertemplate: '%{customdata}<extra></extra>',
+    textposition: 'bottom center',
 	marker: { size: 10, color: 'blue'}
 }
 
@@ -31,7 +32,7 @@ export default function Scatter() {
                 y: estate.pca[1],
                 customdata: estate.entries.map((entry) =>
                     entry.content.length > 120 ? 
-						(entry.content.slice(0, 80) + "... " +
+						(entry.content.slice(0, 80) + '... ' +
 						entry.content.slice(entry.content.length-40, entry.content.length)) : entry.content
                 ),
                 text: estate.entries.map((entry) => `#${entry.entry_id}`),
@@ -54,7 +55,7 @@ export default function Scatter() {
             })
 
             // Attach layout change handler
-            plotRef.current.on("plotly_relayout", (updatedLayout) => {
+            plotRef.current.on('plotly_relayout', (updatedLayout) => {
                 layoutRef.current = { ...layoutRef.current, ...updatedLayout }
             })
         }
@@ -69,19 +70,19 @@ export default function Scatter() {
 	
 	useEffect(() => {
 		// Create the color and size arrays
-		const colorArray = [...Array(estate.entries.length).keys()].map(i => (i + 1 === hoveredId ? '#a3d9a5' : 'blue'));
-		const sizeArray = [...Array(estate.entries.length).keys()].map(i => (i + 1 === hoveredId ? 20 : 10));
+		const colorArray = [...Array(estate.entries.length).keys()].map(i => (i + 1 === hoveredId ? '#a3d9a5' : 'blue'))
+		const sizeArray = [...Array(estate.entries.length).keys()].map(i => (i + 1 === hoveredId ? 20 : 10))
 		
 		// Batch the restyle calls
 		Plotly.restyle(plotRef.current, {
 			'marker.color': [colorArray],
 			'marker.size': [sizeArray],
-		});
-	}, [hoveredId]);
+		})
+	}, [hoveredId])
 
     return (
-        <div style={{ height: "100%", width: "100%", margin: 5 }}>
-            <div ref={plotRef} style={{ height: "100%", width: "100%" }} />
+        <div style={{ height: '100%', width: '100%', margin: 5 }}>
+            <div ref={plotRef} style={{ height: '100%', width: '100%' }} />
         </div>
     )
 }

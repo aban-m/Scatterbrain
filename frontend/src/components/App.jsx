@@ -1,16 +1,13 @@
-import { useState } from 'react'
+import { Box, useMediaQuery, useTheme } from '@mui/material'
 import InputArea from './InputArea'
 import Scatter from './Scatter'
-import { Box, SwipeableDrawer, useMediaQuery, Container } from "@mui/material";
 import { EmbeddingsProvider } from '../contexts/EmbeddingsContext'
-
-import { useTheme } from "@mui/material/styles";
-import { StateProvider } from '../contexts/StateContext';
+import { StateProvider } from '../contexts/StateContext'
+import '../styles/App.css'
 
 export default function App() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [menuOpen, setMenuOpen] = useState(false);
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
     <EmbeddingsProvider>
@@ -30,8 +27,8 @@ export default function App() {
             p: isMobile ? 'clamp(1em, 1%, 1em) 0 0 0' : '0 clamp(1em, 1%, 1em) 0 clamp(1em, 1%, 1em)',
             order: isMobile ? 1 : 0,
             ...(isMobile ? { maxHeight: '20%' } : { minHeight: '20%' }),
-            display: "flex",
-            flexDirection: "column",
+            display: 'flex',
+            flexDirection: 'column',
 		    overflowY: isMobile ? 'initial' : 'auto'
             
           }}>
@@ -49,6 +46,5 @@ export default function App() {
         </Box>
       </StateProvider>
     </EmbeddingsProvider >
-  );
-
+  )
 }
