@@ -6,6 +6,7 @@ const initialLayout = {
     xaxis: { range: [-1, 1], autorange: false },
     yaxis: { range: [-1, 1], autorange: false },
     autosize: true,
+	title: { text: 'Scatterbrain β', font: { size: 20 } }
 }
 
 const initialData = {

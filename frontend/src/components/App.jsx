@@ -3,7 +3,7 @@ import InputArea from './InputArea'
 import Scatter from './Scatter'
 import { Box, SwipeableDrawer, useMediaQuery, Container } from "@mui/material";
 import { EmbeddingsProvider } from '../contexts/EmbeddingsContext'
-
+import '../styles/App.css'
 import { useTheme } from "@mui/material/styles";
 import { StateProvider } from '../contexts/StateContext';
 

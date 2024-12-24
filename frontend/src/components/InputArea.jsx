@@ -17,10 +17,21 @@ import EditIcon from "@mui/icons-material/Edit";
 import Tooltip from '@mui/material/Tooltip'
 import CheckIcon from '@mui/icons-material/CheckCircleOutline';
 import PhotoCameraBackIcon from '@mui/icons-material/PhotoCameraBack';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 
 function InputAreaHeader({waiting}) {
+	const [visible, setVisible] = useState(false);
     return (<>
-		<p>{waiting ? waiting : 'Ready'}</p>
+	<Box sx={{ borderBottom: "1px solid #ccc", display: visible ? 'initial'  :'none' }}>
+		<p style={{fontSize: '1.1em'}}>This app allows you to visualize a 2D version of the embeddings of text.
+		You can also add a picture, where a description of it will be used as the text.</p>
+	</Box>
+	<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+	<p>{waiting ? waiting : 'Ready'}</p>
+	<IconButton onClick={() => setVisible(!visible)} color='primary'>
+		{!visible ? <QuestionMarkIcon /> : <CheckIcon />}
+	</IconButton>
+	</Box>
     </>)
 }
 
