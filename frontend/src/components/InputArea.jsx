@@ -6,7 +6,6 @@ import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import CircularProgress from '@mui/material/CircularProgress'
 
-
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
@@ -20,8 +19,7 @@ import { useWaiting } from '../contexts/StateContext'
 import {
     createText, removeEntry, updateEntry,
 	createImageFromFile, declareStatus,
-    lookupEntry, syncEntries, syncAll,
-    apiCall, apiBase
+    syncEntries, syncAll, apiCall, API_BASE
 } from '../crud.js'
 
 function InputAreaHeader({waiting}) {
@@ -170,7 +168,7 @@ function PhotoEntry({ entry, setFocused, setPCA, setEntries }) {
 			gridColumn: 'span 2'
 		}}>
 			<Tooltip title={entry.content.substring(0, 120) + '...'}>
-				<img src={apiBase() + entry.url} style={{ objectFit: 'cover' }} id={`entry-${entry.entry_id}`} />
+				<img src={API_BASE + entry.url} style={{ objectFit: 'cover' }} id={`entry-${entry.entry_id}`} />
 			</Tooltip>
 		</FocusableDiv>
          <IconButton color='error' disabled={waiting}

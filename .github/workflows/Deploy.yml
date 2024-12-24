@@ -1,63 +1,64 @@
 name: Build and deploy
 
 on:
-    push:
-        branches:
-            - master
-            - test-deploy
+  push:
+    branches:
+      - master
+      - test-deploy
 
 jobs:
   build-frontend:
     name: Build React app
     runs-on: ubuntu-latest
     defaults:
-        run:
-            working-directory: ./frontend
+      run:
+        working-directory: ./frontend
     steps:
-        - name: Checkout repo
-          uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Build project
+        run: npm run build
+        
+      - name: Upload production files
+        uses: actions/upload-artifact@v3
+        with:
+          name: prod-files
+          path: ./frontend/dist
           
-        - name: Install Node.js
-          uses: actions/setup-node@v3
-          
-        - name: Install deps
-          run: npm install
-          
-        - name: Build project
-          run: npm run build
-          
-        - name: Upload production files
-          uses: actions/upload-artifact@v4
-          with:
-            name: prod-files
-            path: ./frontend/dist
-            
   deploy-frontend:
     name: Deploy React app
     needs: build-frontend
     runs-on: ubuntu-latest
-    
     steps:
-        - name: Download production files
-          uses: actions/download-artifact@v4
-          with:
-            name: prod-files
-            path: ./frontend/dist
-        - name: Deploy to GitHub pages
-          uses: peaceiris/actions-gh-pages@v3
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: ./frontend/dist
-    
+      - name: Download production files
+        uses: actions/download-artifact@v3
+        with:
+          name: prod-files
+          path: ./frontend/dist
+          
+      - name: Deploy to GitHub `
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/dist
+          
   deploy-backend:
+    name: Deploy Backend
     runs-on: ubuntu-latest
     steps:
-        - name: Checkout repo
-          uses: actions/checkout@v4
-        
-        - name: Make POST request to reload webapp
-          run: |
-            response=$(curl -X POST "https://www.pythonanywhere.com/api/v0/user/${{ secrets.PA_USERNAME }}/webapps/${{ secrets.PA_DNAME }}/reload/" \
-            -H "Authorization: Token ${{ secrets.PA_TOKEN }}" \
-            -H "Content-Type: application/json" -w "%{http_code}")
-            echo "Response code: $response"
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      
+      - name: Make POST request to reload webapp
+        run: |
+          response=$(curl -X POST "https://www.pythonanywhere.com/api/v0/user/${{ secrets.PA_USERNAME }}/webapps/${{ secrets.PA_DNAME }}/reload/" \
+          -H "Authorization: Token ${{ secrets.PA_TOKEN }}" \
+          -H "Content-Type: application/json" -w "%{http_code}")
+          echo "Response code: $response"
