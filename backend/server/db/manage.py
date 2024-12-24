@@ -78,6 +78,7 @@ def main():
                     print('Aborting.')
                     return
             init_db(conn)
+            migrate_db(conn)
             
         elif args.action == 'migrate':
             migrate_db(conn)
