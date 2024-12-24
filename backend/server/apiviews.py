@@ -1,4 +1,4 @@
-import uuid
+import os
 import base64
 from io import BytesIO
 from flask import Blueprint, request, session, g, abort, send_file, url_for
@@ -16,28 +16,18 @@ def root():
 
 @bp.before_request
 def get_db():
-    if not 'user_id' in session:
-        session['user_id'] = str(uuid.uuid4())
     if 'db' not in g:
         g.db = connect()
+        
+    if not 'user_id' in session:
+        session['user_id'] = os.urandom(7).hex()
+        ops.set_user_id(g.db, session['user_id'])
 
 @bp.teardown_request
 def close_db(exception):
     db = g.pop('db', None)
     if db is not None:
         db.close()
-
-@bp.route('/echo', methods=('POST','GET'))
-def echo():
-    # get the json of the request
-    if request.method == 'GET':
-        return {
-            'echo': '.'
-        }
-    else:
-        return {
-            'echo': request.json['text'].upper()
-        }
 
 @bp.route('/image/<uid>/<int:eid>', methods=('GET',))
 def image(uid, eid):
@@ -46,8 +36,9 @@ def image(uid, eid):
     b64 = ops.get_image(g.db, uid, eid)
     if b64 is None:
         abort(404)
+        
     stream = BytesIO(base64.b64decode(b64))
-    return send_file(stream, mimetype='image/jpeg')
+    return send_file(stream, mimetype='image/jpeg')         # TODO: Ensure that this causes no issues
     
 @bp.route('/pca', methods=('PATCH', 'GET'))
 def pca():
@@ -68,7 +59,6 @@ def embeddings():
 @bp.route('/entries', methods=('GET', 'DELETE', 'POST'))
 @bp.route('/entries/<int:eid>', methods=('GET', 'PATCH', 'DELETE'))
 def entries(eid=None):
-    # get the json of the request
     if request.method == 'GET':
         if eid is None:
             entries = [dict(x) for x in ops.read_user(g.db, session['user_id'])]
@@ -115,8 +105,6 @@ def entries(eid=None):
             
         return {'ok': True}
 
-    else:
-        raise NotImplementedError()
 
 
 @bp.route('/whoami')

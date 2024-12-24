@@ -19,10 +19,15 @@ def _update_user(conn, user_id: str, total_entries: int, pca_synced: bool):
 
 def set_synced(conn, user_id, val):
     conn.execute('UPDATE Users SET pca_synced = ? WHERE user_id = ?;', (val, user_id,))
+    
 def get_synced(conn, user_id):
     row = conn.execute('SELECT pca_synced FROM Users WHERE user_id = ?;', (user_id,)).fetchone()
     if not row: return True
     return row[0]
+
+def set_user_ip(conn, user_id, ip_addr):
+    conn.execute('UPDATE Users SET ip_addr = ? WHERE user_id = ?;', (ip_addr, user_id));
+    conn.commit()
 
 def is_image(conn, user_id, entry_id):
     row = conn.execute('SELECT FROM Entries WHERE user_id = ? AND entity_id = ?;', (user_id, entity_id)).fetchone()
