@@ -19,7 +19,7 @@ import { useWaiting } from '../contexts/StateContext'
 import {
     createText, removeEntry, updateEntry,
 	createImageFromFile, declareStatus,
-    syncEntries, syncAll, apiCall, API_BASE
+    syncEntries, syncAll, apiCall, API_HOST
 } from '../crud.js'
 
 function InputAreaHeader({waiting}) {
@@ -168,7 +168,7 @@ function PhotoEntry({ entry, setFocused, setPCA, setEntries }) {
 			gridColumn: 'span 2'
 		}}>
 			<Tooltip title={entry.content.substring(0, 120) + '...'}>
-				<img src={API_BASE + entry.url} style={{ objectFit: 'cover' }} id={`entry-${entry.entry_id}`} />
+				<img src={API_HOST + entry.url} style={{ objectFit: 'cover' }} id={`entry-${entry.entry_id}`} />
 			</Tooltip>
 		</FocusableDiv>
          <IconButton color='error' disabled={waiting}
