@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Entries;
-
+DROP TABLE IF EXISTS migrations;
 CREATE TABLE Users (
     user_id VARCHAR(255) PRIMARY KEY,
     total_entries INT DEFAULT 0,
@@ -21,4 +21,10 @@ CREATE TABLE Entries (
 
     PRIMARY KEY (user_id, entry_id),
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS migrations (
+    id INTEGER PRIMARY KEY,
+    description TEXT NOT NULL,
+    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
