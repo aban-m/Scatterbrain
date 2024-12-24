@@ -8,9 +8,10 @@ The dimensions of these vectors are often in the thousands, so they are impossib
 
 ## Getting started
 ### Prerequisites
+The project has a Flask (Python) backend and a React frontend. To run it locally, you need:
 - Python 3.10 or later.
 - [Node.js](https://nodejs.org/) (tested with v22).
-The project has a Flask (Python) backend and a React frontend. All storage is done at the server, currently persisted in a Sqlite3 database.  
+
 First, clone the repository:
 ```bash
 git clone https://github.com/aban-m/Scatterbrain.git
