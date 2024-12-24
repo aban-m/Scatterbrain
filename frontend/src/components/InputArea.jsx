@@ -192,6 +192,9 @@ function TextEntryEdit({ entry,  setFocused, setPCA, setEntries }) {
 
     return (
         <>
+            <p style={{ display: 'flex', alignItems: 'center' }}>
+		{entry.entry_id}
+	    </p>
             <input style={{ gridColumn: 'span 2' }}
                 ref={editRef}
                 defaultValue={entry.content}></input>
