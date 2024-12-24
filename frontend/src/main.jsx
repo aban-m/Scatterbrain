@@ -7,3 +7,4 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+document.title = `Scatterbrain - v${__APP_VERSION__}`
