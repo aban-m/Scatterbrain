@@ -75,7 +75,7 @@ export default function InputArea({ setPCA, setEntries }) {
     switch (mode) {
       case "direct":
         declareStatus(setWaiting, "Embedding text...", "Critical error!", () =>
-          createText(inputRef.current.value)
+          createText(inputRef.current.value, "text")
         ).then(() => syncAll({ setPCA, setEntries }));
         inputRef.current.value = "";
         break;

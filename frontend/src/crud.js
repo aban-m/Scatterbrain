@@ -38,8 +38,8 @@ export function syncAll({setEntries, setPCA}) {
 	syncPCA(setPCA)])
 }
 
-export function createText(text) {
-	return apiCall('POST', '/entries', { text: text })
+export function createText(text, type) {
+	return apiCall('POST', '/entries', { text, type }) 
 }
 
 export function createImageFromFile({ base64Data, filename, mimetype }) {
