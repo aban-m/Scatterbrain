@@ -19,12 +19,12 @@ function InputAreaHeader({ waiting }) {
           display: visible ? "initial" : "none",
         }}
       >
-        <p style={{ fontSize: "1.1em", align: "justify" }}>
+        <p style={{ fontSize: "1.1em", textAlign: "justifyLow" }}>
           This app allows you to visualize a 2D version of the embeddings of
           text. You can also add a picture, where a description of it will be
           used as the text.
           <br />
-          For more information, please checkout
+          For more information, please checkout &nbsp;
           <a href="https://github.com/aban-m/Scatterbrain">the GitHub page.</a>
         </p>
       </Box>
@@ -53,7 +53,7 @@ export default function Sidebar() {
         <InputAreaHeader waiting={waiting} />
       </Box>
 
-      <Box sx={{ my: 3, display: "flex", gap: 1 }}>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
         <InputArea {...{ setPCA, setEntries }} />
       </Box>
 
