@@ -1,9 +1,14 @@
 from .api_calls import invoke_openai
 
-def embed(text):
-    resp = invoke_openai('/embeddings', {
-        'model': 'text-embedding-3-small',
-        'input': text
-    })
+EMBEDDING_MODEL = "text-embedding-3-small"
 
-    return resp['data'][0]['embedding']
+
+def embed(text: str) -> list[float]:
+    resp = invoke_openai("/embeddings", {"model": EMBEDDING_MODEL, "input": text})
+    return resp["data"][0]["embedding"]
+
+
+def multiembed(texts: list[str]) -> list[list[float]]:
+    resp = invoke_openai("/embeddings", {"model": EMBEDDING_MODEL, "input": texts})
+    return [obj["embedding"] for obj in resp["data"]]
+
