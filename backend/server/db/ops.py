@@ -87,10 +87,6 @@ WHERE user_id = ? AND entry_id = ?;''', (new_text, marshal_array(new_embedding),
 
 def update_pcas(conn, user_id: str, pcas: list):
     current_ids = conn.execute('SELECT entry_id FROM entries WHERE user_id = ?;', (user_id, )).fetchall()
-
-    if len(current_ids) != len(pcas):
-        raise ValueError(f'Has {len(current_ids)} entries, got {len(pcas)} vectors.')
-
     conn.executemany('UPDATE entries SET pca = ? WHERE user_id = ? AND entry_id = ?;',
                      [(marshal_array(pca), user_id, row['entry_id']) for pca, row in zip(pcas, current_ids)])
     
