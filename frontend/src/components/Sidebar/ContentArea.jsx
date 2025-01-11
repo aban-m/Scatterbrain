@@ -136,7 +136,7 @@ function TextEntryEdit({ entry, setFocused, setPCA, setEntries }) {
   return (
     <>
       <input
-        style={{ gridColumn: "span 2" }}
+        style={{ gridColumn: "span 3" }}
         ref={editRef}
         defaultValue={entry.content}
       ></input>
