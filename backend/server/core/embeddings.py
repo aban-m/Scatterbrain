@@ -8,7 +8,6 @@ def embed(text: str) -> list[float]:
     return resp["data"][0]["embedding"]
 
 
-def multiembed(texts: list[str]) -> list[list[float]]:
+def multi_embed(texts: list[str]) -> list[list[float]]:
     resp = invoke_openai("/embeddings", {"model": EMBEDDING_MODEL, "input": texts})
     return [obj["embedding"] for obj in resp["data"]]
-

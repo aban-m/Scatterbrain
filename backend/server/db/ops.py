@@ -66,7 +66,7 @@ def get_image(conn, user_id: str, entry_id: int) -> str:
 
 
 def create_text_entry(
-    conn, user_id: str, text: str, embedding: list, commit: bool = True
+    conn, user_id: str, text: str, embedding: list[float], commit: bool = True
 ):
     # find latest id
     latest = read_latest_id(conn, user_id) + 1
@@ -94,7 +94,7 @@ def create_image_entry(
     width: int,
     height: int,
     description: str,
-    embedding: list,
+    embedding: list[float],
 ):
     latest = read_latest_id(conn, user_id) + 1
 
@@ -134,7 +134,9 @@ def delete_entries(conn, user_id: str):
     conn.commit()
 
 
-def update_entry(conn, user_id: str, entry_id: int, new_text: str, new_embedding: str):
+def update_entry(
+    conn, user_id: str, entry_id: int, new_text: str, new_embedding: list[float]
+):
     conn.execute(
         """UPDATE entries SET content = ?, embedding = ? 
 WHERE user_id = ? AND entry_id = ?;""",
@@ -143,7 +145,7 @@ WHERE user_id = ? AND entry_id = ?;""",
     conn.commit()
 
 
-def update_pcas(conn, user_id: str, pcas: list):
+def update_pcas(conn, user_id: str, pcas: list[float]):
     current_ids = conn.execute(
         "SELECT entry_id FROM entries WHERE user_id = ?;", (user_id,)
     ).fetchall()
