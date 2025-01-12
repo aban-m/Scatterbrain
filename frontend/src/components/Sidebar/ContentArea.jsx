@@ -160,7 +160,7 @@ function EntryEdit(props) {
 }
 
 export default function ContentArea() {
-  const { waiting, setWaiting, hoveredId } = useWaiting();
+  const { setWaiting } = useWaiting();
   const { estate, setEntries, setPCA } = useEmbeddings();
   const [focused, setFocused] = useState(null);
 
@@ -170,15 +170,6 @@ export default function ContentArea() {
     );
   }, []);
 
-  useEffect(() => {
-    const el = document.getElementById(`entry-${hoveredId}`);
-    if (el) {
-      el.scrollIntoView({
-        scrollingBehavior: "smooth",
-      });
-    }
-  }, [hoveredId]);
-
   return (
     <>
       {/* List of TextElements */}
@@ -186,7 +177,7 @@ export default function ContentArea() {
         sx={{
           display: "grid",
           gridTemplateColumns: "1fr 8fr 2fr 2fr",
-          gridTemplateRows: "minmax(10pt, auto)",
+          gridTemplateRows: "minmax(40pt, auto)",
           gridAutoFlow: "rows",
         }}
       >

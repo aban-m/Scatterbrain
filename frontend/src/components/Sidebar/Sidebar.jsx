@@ -8,8 +8,9 @@ import CheckIcon from "@mui/icons-material/Check";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { useWaiting } from "../../contexts/StateContext";
 import { useEmbeddings } from "../../contexts/EmbeddingsContext";
+import { declareStatus, removeEntries, syncAll } from "../../crud.js";
 
-function InputAreaHeader({ waiting }) {
+function InputAreaHeader({ waiting, setWaiting, setEntries, setPCA }) {
   const [visible, setVisible] = useState(false);
   return (
     <>
@@ -36,6 +37,18 @@ function InputAreaHeader({ waiting }) {
         }}
       >
         <p>{waiting ? waiting : "Ready"}</p>
+        <IconButton
+          onClick={() => {
+            declareStatus(
+              setWaiting,
+              "Resetting...",
+              "Critical error!",
+              removeEntries
+            ).then(() => syncAll({ setEntries, setPCA }));
+          }}
+        >
+          R
+        </IconButton>
         <IconButton onClick={() => setVisible(!visible)} color="primary">
           {!visible ? <HelpOutlineIcon /> : <CheckIcon />}
         </IconButton>
@@ -45,12 +58,12 @@ function InputAreaHeader({ waiting }) {
 }
 
 export default function Sidebar() {
-  const { waiting } = useWaiting();
+  const { waiting, setWaiting } = useWaiting();
   const { setPCA, setEntries } = useEmbeddings();
   return (
     <>
       <Box sx={{ borderBottom: "1px solid #ccc" }}>
-        <InputAreaHeader waiting={waiting} />
+        <InputAreaHeader {...{ setPCA, setEntries, waiting, setWaiting }} />
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column" }}>
