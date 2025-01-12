@@ -20,17 +20,18 @@ import {
 function FocusableDiv({ hoveredId, setHoveredId, entry, children, style }) {
   return (
     <div
-      onMouseOver={(e) => {
-        e.target.style.opacity = "0.9";
-        setHoveredId(entry.entry_id);
-      }}
-      onMouseOut={(e) => {
-        e.target.style.opacity = "1";
-        setHoveredId(null);
+      onClick={(e) => {
+        if (hoveredId !== entry.entry_id) {
+          e.target.style.opacity = "0.9";
+          setHoveredId(entry.entry_id);
+        } else {
+          e.target.style.opacity = "1";
+          setHoveredId(null);
+        }
       }}
       style={{
-        borderWidth: entry.entry_id === hoveredId ? "5px" : "0px",
-        borderStyle: "solid",
+        borderWidth: "5px",
+        borderStyle: hoveredId === entry.entry_id ? "solid" : "none",
         borderColor: "#a3d9a5",
         borderRadius: "2px",
         transition: "all 0.15s ease-in-out",
@@ -174,7 +175,6 @@ export default function ContentArea() {
     if (el) {
       el.scrollIntoView({
         scrollingBehavior: "smooth",
-        block: "center",
       });
     }
   }, [hoveredId]);
