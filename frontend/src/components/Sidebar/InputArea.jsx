@@ -72,19 +72,13 @@ export default function InputArea({ setPCA, setEntries }) {
       inputRef.current.focus();
       return;
     }
-    switch (mode) {
-      case "direct":
-        declareStatus(setWaiting, "Embedding text...", "Critical error!", () =>
-          createText(inputRef.current.value, "text")
-        ).then(() => syncAll({ setPCA, setEntries }));
-        inputRef.current.value = "";
-        break;
-      case "reddit":
-        alert("Not implemented yet, I am afraid.");
-        break;
-      default:
-        alert("For real?");
-    }
+    declareStatus(
+      setWaiting,
+      mode === "direct" ? "Embedding text..." : "Ingesting content...",
+      "Critical error!",
+      () => createText(inputRef.current.value, mode)
+    ).then(() => syncAll({ setPCA, setEntries }));
+    inputRef.current.value = "";
   };
 
   return (
